@@ -7,6 +7,12 @@
 out
 gen
 
+# Byte-compiled / optimized / DLL files
+__pychche__/
+*.py[cod]
+*&py.class
+
+
 # 一些文档
 开发文档.md
 config.yaml
