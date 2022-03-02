@@ -16,3 +16,9 @@ __pychche__/
 # 一些文档
 开发文档.md
 config.yaml
+
+# 临时文件
+tmp/
+
+# 日志文件
+*.log
