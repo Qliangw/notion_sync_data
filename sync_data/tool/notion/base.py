@@ -12,7 +12,7 @@ class NotionBaseInfo:
     notion基础信息
     """
     def __init__(self, token):
-        log_detail.info("【RUN】notion参数初始化...")
+        log_detail.debug("【RUN】notion参数初始化...")
         self.__base_url = "https://api.notion.com"
         self.__database_url = self.__base_url + "/v1/databases"
         self.__page_url = self.__base_url + "/v1/pages"
@@ -22,7 +22,7 @@ class NotionBaseInfo:
         self.__headers = {'Authorization': f'Bearer {token}',
                         'Notion-Version': '2022-02-22',
                         "Content-Type": "application/json"}
-        log_detail.info("【RUN】notion完成初始化")
+        log_detail.debug("【RUN】notion完成初始化")
 
     def get_db_url(self):
         return self.__database_url
