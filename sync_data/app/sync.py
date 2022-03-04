@@ -11,6 +11,7 @@ from sync_data.tool.douban.data.enum_data import MediaType, MediaStatus, MediaIn
 from sync_data.tool.douban.soup import parser
 from sync_data.tool.douban.soup.parser import ParserHtmlText
 from sync_data.tool.notion import databases
+from sync_data.tool.notion.databases import create_database
 from sync_data.utils import log_detail
 from sync_data.utils.config import Config
 
@@ -46,7 +47,6 @@ def start_sync(media_type, media_status):
                                                   start_number=start_number)
         log_detail.info(f"【RUN】访问第{page_number}页数据完成")
 
-
         # 创建一个解析实例
         info_instance = ParserHtmlText(html_text)
         # 获取全部url
@@ -72,12 +72,18 @@ def start_sync(media_type, media_status):
 
             databases.update_database(data_dict=html_dict,
                                       database_id=book_db_id,
-                                      token=token)
+                                      token=token,
+                                      media_status=media_status)
         log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
         if url_num > 14:
             start_number += 15
         else:
             break
-    log_detail.info(f"【RUN】所有信息已导入notion！,共计导入{(page_number-1)*15+len(url_list)}条数据")
+    log_detail.info(f"【RUN】所有信息已导入notion，共计导入{(page_number-1)*15+len(url_list)}条数据。")
 
 
+def init_database():
+    config_dict = Config().get_config()
+    token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
+    page_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_PAGE_ID.value]
+    create_database(token=token, page_id=page_id)

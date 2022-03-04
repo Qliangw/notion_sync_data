@@ -13,7 +13,7 @@ from sync_data.utils import log_detail
 # 抄作业 https://github.com/jxxghp/nas-tools/blob/master/config.py
 
 # 日志级别
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
 lock = threading.Lock()
 
 

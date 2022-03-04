@@ -147,7 +147,7 @@ def create_database(token, page_id):
     db_res = RequestUtils()
     res = db_res.post(url=db_data.get_db_url(), params=params, headers=db_data.get_headers())
     if res.status_code == 200:
-        log_detail.info(res.text)
+        log_detail.debug(res.text)
         database_id = eval(res.text.replace(":null", ":'null'").replace(":false", ":'false'"))["id"]
         return database_id
     else:
@@ -156,17 +156,18 @@ def create_database(token, page_id):
         exit()
 
 
-def update_database(data_dict, database_id, token):
+def update_database(data_dict, database_id, token, media_status):
     """
     写入数据库
 
     :param data_dict: 待写入数据字典
     :param database_id: 数据库id
     :param token:【必须】
+    :param media_status: 标记状态
     :return: TODO 返回一个成功后的页面ID
     """
     try:
-        body = get_book_body(data_dict, database_id, MediaStatus.WISH.value)
+        body = get_book_body(data_dict, database_id, media_status)
         body = json.dumps(body)
         page_data = base.NotionBaseInfo(token)
         req = RequestUtils()
