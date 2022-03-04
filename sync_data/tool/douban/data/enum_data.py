@@ -29,15 +29,25 @@ class MediaInfo(Enum):
     """
     媒体信息
     """
-    NAME = "name"
-    STATUS_DATE = "status_date"
-    STATUS = "status"
-    URL = "url"
-    JPG = "jpg"
-    AUTHOR = "author"
-    PUB = "pub"
-    PUB_DATE = "pub_date"
-    PRICE = "price"
+    # 通用 默认为字符串str, 后面加_F则为float型
+    # 评分 个人评分 简介 短评
+    TITLE = "title"                     # 媒体名称
+    STATUS = "status"                   # 标记
+    STATUS_DATE = "status_date"         # 标记日期
+    IMG = "img"                         # 封面、海报
+    URL = "url"                         # 链接
+    TAG_LIST = "tag_list"               # 标签
+    RATING_F = "rating"                 # 评分
+    ASSESS = 'assess'                   # 评价数
+
+    # 书籍
+    AUTHOR = "author"                   # 作者
+    PUBLISHER = "publisher"             # 出版社
+    PUB_DATE = "pub_date"               # 出版日期
+    PRICE = "price"                     # 价格
+    ISBN = 'isbn'                       # ISBN
+    SUBHEAD = 'book_subhead'            # 副标题
+    PAGES = 'pages'                     # 页数
 
 
 class MediaXpathParam(Enum):

@@ -20,17 +20,17 @@ class DouBanBase:
         :param user_cookies: 留空即可【用户cookie, 预留】
         """
         # user_agent为空，设为默认
-        log_detail.info("DouBanBase初始化")
+        log_detail.debug("【RUN】DouBanBase初始化")
         if user_agent is None:
-            log_detail.info("配置默认user-agent的值")
+            log_detail.debug("【RUN】配置默认user-agent的值")
             self.headers = self.__headers
         else:
-            log_detail.info("配置用户自定义user-agent的值")
             self.headers = {"User-Agent": f"{user_agent}"}
+            log_detail.debug("【RUN】配置用户{user-agent}")
 
         # cookies为空，先访问一次首页
         if user_cookies is None:
-            log_detail.info("访问豆瓣主页，配置默认cookie")
+            log_detail.debug("【RUN】访问豆瓣主页，配置默认cookie")
             try:
                 self.req = RequestUtils(request_interval_mode=True)
                 res = self.req.get_res("https://www.douban.com/", headers=self.headers)
@@ -38,15 +38,15 @@ class DouBanBase:
                 cookie = requests.utils.dict_from_cookiejar(cookies)
                 self.cookie = cookie
             except Exception as err:
-                log_detail.info(f"获取cookie失败:{format(err)}")
+                log_detail.error(f"【RUN】获取cookie失败:{format(err)}")
 
         else:
-            log_detail.info("配置用户自定义cookie")
             self.cookies = user_cookies
+            log_detail.debug(f"【RUN】配置用户自定义cookie：{user_cookies}")
 
     def __set_cookies(self, res):
         if res.cookies.values() is None:
-            log_detail.info(f"配置默认cookie：{res.cookies}")
+            log_detail.debug(f"【RUN】配置默认cookie：{res.cookies}")
             self.cookies = res.cookies.values()
 
     def __get_cookies(self):
@@ -72,18 +72,21 @@ class DouBanBase:
             url = f"https://{media_type}.douban.com/people/{user_id}/{media_status}?start={start_number}&sort=time&rating=all&filter=all&mode=grid"
 
         headers = self.__get_headers()
-        log_detail.info(f"获取headers：{headers}")
+        log_detail.debug(f"【RUN】获取headers：{headers}")
+
         cookies = self.__get_cookies()
-        log_detail.info(f"获取cookies{cookies}")
+        log_detail.debug(f"【RUN】获取cookies{cookies}")
+
         try:
-            log_detail.info("请求url，获取返回值")
             res = self.req.get_res(url=url, headers=headers, cookies=cookies)
+            log_detail.info("【RUN】请求url，获取返回值")
+
             res_text = res.text
             if res_text.find('有异常请求从你的 IP 发出') != -1:
-                log_detail.info("被豆瓣识别到抓取行为了，请更换 IP 后才能使用")
+                log_detail.warn("【RUN】被豆瓣识别到抓取行为了，请更换 IP 后才能使用")
                 return None
             # return etree.HTML(res_text)
             return res_text
         except Exception as err:
-            log_detail.info(f"获取{url}页面失败:{format(err)}")
+            log_detail.error(f"【RUN】获取{url}页面失败:{format(err)}")
             return None
