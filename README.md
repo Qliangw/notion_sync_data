@@ -1,7 +1,9 @@
 # notion_sync_data
 将网络数据中的个人标记媒体同步到notion笔记，方便快速查阅。
 
-- 目前仅只是豆瓣书籍的信息
+- 目前仅支持获取豆瓣书籍的信息
+
+> 该库是学习python做的自用小工具，代码参考于网络。（写的比较烂，大佬们请绕行）
 
 
 ## 功能
@@ -18,6 +20,16 @@
 - [ ] 同步豆瓣内容
 - [ ] 添加GUI
 - [ ] 添加提取数据内容的获取
+
+
+
+## 页面展示
+
+
+
+![](https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png)
+
+
 
 ## 使用
 
@@ -79,7 +91,9 @@
 
 
 
-- [jarrett]: https://github.com/jarrett-au/douban2noition
+- 感谢 [jarrett-au](https://github.com/jarrett-au/douban2noition ) 
 
-- [Geetheshe]: https://github.com/Geetheshe/DoubanMovieListBackUpToNotion
+- 感谢 [Geetheshe](https://github.com/Geetheshe/DoubanMovieListBackUpToNotion ) 
+- 感谢 [jxxghp](https://github.com/jxxghp/nas-tools) 
 
+- 感谢靓仔
