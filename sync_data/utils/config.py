@@ -13,8 +13,7 @@ from sync_data.utils import log_detail
 # 抄作业 https://github.com/jxxghp/nas-tools/blob/master/config.py
 
 # 日志级别
-LOG_LEVEL = logging.INFO
-
+LOG_LEVEL = logging.DEBUG
 lock = threading.Lock()
 
 
@@ -24,13 +23,13 @@ class Config(object):
     __config_path = None
 
     def __init__(self):
-        self.__config_path = os.path.abspath(os.path.join(os.getcwd(), "../../doc/config.yaml"))
+        self.__config_path = os.path.abspath(os.path.join(os.getcwd(), "./doc/config.yaml"))
         # print("获取配置文件路径：%s" % self.__config_path)
         self.load_config()
 
     @staticmethod
     def __get_config_path(self):
-        return os.path.abspath(os.path.join(os.getcwd(), "../../doc/config.yaml"))
+        return os.path.abspath(os.path.join(os.getcwd(), "./doc/config.yaml"))
 
     @staticmethod
     def get_instance():
@@ -47,7 +46,7 @@ class Config(object):
     def load_config(self):
         try:
             if not os.path.exists(self.__config_path):
-                log_detail.info("【RUN】配置文件不存在，请复制/doc/config.yaml.simple 到本目录为config.yaml，再重新启动")
+                # log_detail.info("【RUN】配置文件不存在，请复制/doc/config.yaml.simple 到本目录为config.yaml，再重新启动")
                 quit()
             with open(self.__config_path, 'r', encoding='utf-8') as file:
                 self.__config = yaml.safe_load(file)
