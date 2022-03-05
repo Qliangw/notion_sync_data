@@ -54,15 +54,25 @@ sync_data/
 
 
 
+## [使用方法](https://github.com/Qliangw/notion_sync_data/wiki/Wiki#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+
+
+
 ## 页面展示
 
-
-
-![](https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png)
+数据内容包括【书封面、标题、作者、评分、评分人数、出版社、出版年份、标记状态、ISBN、豆瓣链接、~~短评~~、~~标记时间~~、~~类型~~】
 
 
 
-## [使用方法](https://github.com/Qliangw/notion_sync_data/wiki/Wiki#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+### 表格模式
+
+<img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/databases.png" style="zoom:80%;" />
+
+### 封面模式
+
+<img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png" style="zoom: 50%;" />
+
+
 
 
 
