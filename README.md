@@ -3,7 +3,45 @@
 
 - 目前仅支持获取豆瓣书籍的信息
 
-> 该库是学习python做的自用小工具，代码参考于网络。（写的比较烂，大佬们请绕行）
+> 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
+
+
+
+
+
+```pascal
+notion_sync_data/
+├── README.md
+├── doc/
+│   ├── config.yaml             # 配置文件
+│   └── config.yaml.simple		# 配置示例
+├── requirements.txt			# 运行依赖
+├── run.py						# 程序入口
+├── sync_data/
+│   ├── app/
+│   │   └── sync.py
+│   ├── data/
+│   │   └── user_config.py
+│   ├── test/
+│   │   └── test.py
+│   ├── tool/
+│   │   ├── douban/
+│   │   │   ├── base.py
+│   │   │   ├── data/
+│   │   │   │   └── enum_data.py
+│   │   │   └── soup/
+│   │   │       └── parser.py
+│   │   └── notion/
+│   │       ├── base.py
+│   │       ├── databases.py
+│   │       └── query.py
+│   └── utils/
+│       ├── config.py
+│       ├── http_utils.py
+│       └── log_detail.py
+```
+
+
 
 
 ## 功能
