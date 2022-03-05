@@ -1,38 +1,9 @@
 # notion_sync_data
-将网络数据中的个人标记媒体同步到notion笔记，方便快速查阅。
+将网络数据同步到notion笔记，方便快速查阅。
 
 - 目前仅支持获取豆瓣书籍的信息
 
 > 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
-
-
-
-**目录结构**
-
-```
-run.py # 主程序
-|
-sync_data/
-├── app/
-│   └── sync.py
-├── data/
-│   └── user_config.py
-├── test/
-│   └── test.py
-├── tool/
-│   ├── douban/			# 豆瓣获取信息工具
-│   │   ├── base.py
-│   │   ├── data/
-│   │   └── soup/
-│   └── notion/			# notion接口
-│       ├── base.py
-│       ├── databases.py
-│       └── query.py
-└── utils/
-    ├── config.py
-    ├── http_utils.py
-    └── log_detail.py
-```
 
 
 
@@ -73,6 +44,35 @@ sync_data/
 <img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png" style="zoom: 50%;" />
 
 
+
+
+
+## 目录结构
+
+```
+run.py # 主程序
+|
+sync_data/
+├── app/
+│   └── sync.py
+├── data/
+│   └── user_config.py
+├── test/
+│   └── test.py
+├── tool/
+│   ├── douban/			# 豆瓣获取信息工具
+│   │   ├── base.py
+│   │   ├── data/
+│   │   └── soup/
+│   └── notion/			# notion接口
+│       ├── base.py
+│       ├── databases.py
+│       └── query.py
+└── utils/
+    ├── config.py
+    ├── http_utils.py
+    └── log_detail.py
+```
 
 
 
