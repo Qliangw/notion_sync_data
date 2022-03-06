@@ -16,6 +16,7 @@ __pychche__/
 # 一些文档
 开发文档.md
 config.yaml
+test.py
 
 # 临时文件
 tmp/

@@ -12,6 +12,7 @@ from sync_data.tool.douban.soup import parser
 from sync_data.tool.douban.soup.parser import ParserHtmlText
 from sync_data.tool.notion import databases
 from sync_data.tool.notion.databases import create_database
+from sync_data.tool.notion.query import get_notion_media_status
 from sync_data.utils import log_detail
 from sync_data.utils.config import Config
 
@@ -54,26 +55,39 @@ def start_sync(media_type, media_status):
         url_num = len(url_list)
         log_detail.info(f"【RUN】本页有{url_num}个媒体")
         for url in url_list:
+            now_status = ""
+            if media_status == MediaStatus.WISH.value:
+                now_status = "想看"
+            elif media_status == MediaStatus.DO.value:
+                now_status = "在看"
+            elif media_status == MediaStatus.COLLECT.value:
+                now_status = "看过"
+            # 查询数据库中是否存在
+            notion_media_status = get_notion_media_status(token=token,
+                                                          database_id=book_db_id,
+                                                          media_url=url)
             # 随机休眠5-10秒钟
             time_number = random.randint(5, 10)
-            log_detail.info(f"【RUN】随机休眠时间5-10s，本次休眠：{time_number}s")
+            log_detail.info(f"----------------------------------\n【RUN】随机休眠时间5-10s，本次休眠：{time_number}s")
+            if notion_media_status == "不存在" or notion_media_status != now_status:
+                html_text = douban_instance.get_html_text(url=url,
+                                                          user_id=user_id,
+                                                          media_type=MediaType.BOOK.value,
+                                                          media_status=MediaStatus.WISH.value)
+                # 创一个详情页实例
+                html_parser = parser.ParserHtmlText(html_text=html_text)
+                # 解析详情页，获取数据字典
+                html_dict = html_parser.get_parser_dict(MediaType.BOOK.value)
 
-            html_text = douban_instance.get_html_text(url=url,
-                                                      user_id=user_id,
-                                                      media_type=MediaType.BOOK.value,
-                                                      media_status=MediaStatus.WISH.value)
-            # 创一个详情页实例
-            html_parser = parser.ParserHtmlText(html_text=html_text)
-            # 解析详情页，获取数据字典
-            html_dict = html_parser.get_parser_dict(MediaType.BOOK.value)
+                # 添加url
+                html_dict[MediaInfo.URL.value] = url
 
-            # 添加url
-            html_dict[MediaInfo.URL.value] = url
-
-            databases.update_database(data_dict=html_dict,
-                                      database_id=book_db_id,
-                                      token=token,
-                                      media_status=media_status)
+                databases.update_database(data_dict=html_dict,
+                                          database_id=book_db_id,
+                                          token=token,
+                                          media_status=media_status)
+            else:
+                log_detail.info(f"【RUN】notion中含有本条数据，已跳过！\n\t媒体链接：{url}")
         log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
         if url_num > 14:
             start_number += 15

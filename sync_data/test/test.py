@@ -12,7 +12,7 @@ from sync_data.tool.douban.base import DouBanBase
 from sync_data.tool.douban.data.enum_data import MediaInfo, MediaType, MediaStatus, Enum
 from sync_data.tool.douban.soup import parser
 from sync_data.tool.douban.soup.parser import ParserHtmlText
-from sync_data.tool.douban.tmp import douban_books
+# from sync_data.tool.douban.tmp import douban_books
 from sync_data.tool.notion import databases
 from sync_data.utils import log_detail
 from sync_data.utils.config import Config
@@ -138,6 +138,6 @@ if __name__ == '__main__':
     # print("测试入口：")
     # get_url_and_parser_to_inster_databases()
     # notion_test()
-    test_url_list()
-    # log_detail.info("info")
+    # test_url_list()
+    log_detail.info("info")
     # log_detail.warn("warn")
