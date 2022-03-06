@@ -16,6 +16,7 @@
 - [ ] 获取豆瓣音乐
 - [x] 创建notion数据库
 - [x] 插入notion库
+- [x] 已添加的不再重复添加（根据豆瓣链接判断）
 
 **TODO**
 
@@ -44,7 +45,17 @@
 <img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png" style="zoom: 50%;" />
 
 
+### 更新日志
 
+#### 2022-03-06
+
+- fix：增加过滤功能，数据不再重复添加
+
+------
+
+#### 2022-03-04
+
+- 支持豆瓣书籍的导入
 
 
 ## 目录结构
