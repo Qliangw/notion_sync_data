@@ -14,92 +14,153 @@ from sync_data.tool.notion import base
 from sync_data.utils.http_utils import RequestUtils
 
 
-def get_book_body(data_dict, database_id, media_status):
+def get_body(data_dict, database_id, media_status, media_type):
     """
     获取json数据
 
+    :param media_type:
     :param media_status:
     :param data_dict:
     :param database_id:
     :return:
     """
+    status = ""
+    music_status = ""
     if media_status == MediaStatus.WISH.value:
-        media_status = "想看"
+        status = "想看"
+        music_status = "想听"
     elif media_status == MediaStatus.DO.value:
-        media_status = "在看"
+        status = "在看"
+        music_status = "在听"
     elif media_status == MediaStatus.COLLECT.value:
-        media_status = "看过"
+        status = "看过"
+        music_status = "听过"
     else:
-        media_status = ""
+        status = ""
+        music_status = ""
 
-    log_detail.info("【RUN】数据信息整理为json格式")
-    body = {
-        "parent": {
-            "type": "database_id",
-            "database_id": f"{database_id}"
-        },
-        "properties": {
-            "书名": {
-                "title": [{
-                    "type": "text",
-                    "text": {
-                        "content": data_dict[MediaInfo.TITLE.value]
+    log_detail.info(f"【RUN】{media_type}数据信息整理为json格式")
+    if media_type == MediaType.MUSIC.value:
+        body = {
+            "parent": {
+                "type": "database_id",
+                "database_id": f"{database_id}"
+            },
+            "properties": {
+                "音乐": {
+                    "title": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.TITLE.value]
+                        }
+                    }]
+                },
+                "封面": {
+                    "files": [{
+                        "type": "external",
+                        "name": data_dict[MediaInfo.IMG.value][-13:],
+                        "external": {
+                            "url": data_dict[MediaInfo.IMG.value]
+                        }
+                    }]
+                },
+                "评分": {
+                    "number": float(data_dict[MediaInfo.RATING_F.value])
+                },
+                "表演者": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.PERFORMER.value]
+                        }
+                    }]
+                },
+                "发行时间": {
+                    "select": {
+                        "name": data_dict[MediaInfo.RELEASE_DATE.value][0:4]
                     }
-                }]
-            },
-            "ISBN": {
-                "url": f"https://isbnsearch.org/isbn/{data_dict[MediaInfo.ISBN.value]}"
-            },
-            "封面": {
-                "files": [{
-                    "type": "external",
-                    "name": data_dict[MediaInfo.IMG.value][-13:],
-                    "external": {
-                        "url": data_dict[MediaInfo.IMG.value]
+                },
+                "标记状态": {
+                    "select": {
+                        "name": f"{music_status}"
                     }
-                }]
-            },
-            "评分": {
-                "number": float(data_dict[MediaInfo.RATING_F.value])
-            },
-            "作者": {
-                "rich_text": [{
-                    "type": "text",
-                    "text": {
-                        "content": data_dict[MediaInfo.AUTHOR.value]
-                    }
-                }]
-            },
-            "出版年份": {
-                "select": {
-                    "name": data_dict[MediaInfo.PUB_DATE.value][0:4]
+                },
+                "豆瓣链接": {
+                    "url": f"{data_dict[MediaInfo.URL.value]}"
                 }
-            },
-            "出版社": {
-                "select": {
-                    "name": data_dict[MediaInfo.PUBLISHER.value]
-                }
-            },
-            "价格": {
-                "number": float(data_dict[MediaInfo.PRICE.value])
-            },
-            "评分人数": {
-                "number": int(data_dict[MediaInfo.ASSESS.value])
-            },
-            "页数": {
-                "number": int(data_dict[MediaInfo.PAGES.value])
-            },
-            "标记状态": {
-                "select": {
-                    "name": f"{media_status}"
-                }
-            },
-            "豆瓣链接": {
-                "url": f"{data_dict[MediaInfo.URL.value]}"
             }
         }
-    }
-    return body
+        return body
+    elif media_type == MediaType.MOVIE.value:
+        pass
+    elif media_type == MediaType.BOOK.value:
+        body = {
+            "parent": {
+                "type": "database_id",
+                "database_id": f"{database_id}"
+            },
+            "properties": {
+                "书名": {
+                    "title": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.TITLE.value]
+                        }
+                    }]
+                },
+                "ISBN": {
+                    "url": f"https://isbnsearch.org/isbn/{data_dict[MediaInfo.ISBN.value]}"
+                },
+                "封面": {
+                    "files": [{
+                        "type": "external",
+                        "name": data_dict[MediaInfo.IMG.value][-13:],
+                        "external": {
+                            "url": data_dict[MediaInfo.IMG.value]
+                        }
+                    }]
+                },
+                "评分": {
+                    "number": float(data_dict[MediaInfo.RATING_F.value])
+                },
+                "作者": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.AUTHOR.value]
+                        }
+                    }]
+                },
+                "出版年份": {
+                    "select": {
+                        "name": data_dict[MediaInfo.PUB_DATE.value][0:4]
+                    }
+                },
+                "出版社": {
+                    "select": {
+                        "name": data_dict[MediaInfo.PUBLISHER.value]
+                    }
+                },
+                "价格": {
+                    "number": float(data_dict[MediaInfo.PRICE.value])
+                },
+                "评分人数": {
+                    "number": int(data_dict[MediaInfo.ASSESS.value])
+                },
+                "页数": {
+                    "number": int(data_dict[MediaInfo.PAGES.value])
+                },
+                "标记状态": {
+                    "select": {
+                        "name": f"{status}"
+                    }
+                },
+                "豆瓣链接": {
+                    "url": f"{data_dict[MediaInfo.URL.value]}"
+                }
+            }
+        }
+        return body
 
 
 def create_database(token, page_id, media_type):
@@ -194,10 +255,11 @@ def create_database(token, page_id, media_type):
         log_detail.error(f"【RUN】创建数据库错误{err}")
 
 
-def update_database(data_dict, database_id, token, media_status):
+def update_database(data_dict, database_id, token, media_status, media_type):
     """
     写入数据库
 
+    :param media_type: 媒体类型
     :param data_dict: 待写入数据字典
     :param database_id: 数据库id
     :param token:【必须】
@@ -205,7 +267,10 @@ def update_database(data_dict, database_id, token, media_status):
     :return: TODO 返回一个成功后的页面ID
     """
     try:
-        body = get_book_body(data_dict, database_id, media_status)
+        body = get_body(data_dict=data_dict,
+                        database_id=database_id,
+                        media_status=media_status,
+                        media_type=media_type)
         body = json.dumps(body)
         page_data = base.NotionBaseInfo(token)
         req = RequestUtils()
