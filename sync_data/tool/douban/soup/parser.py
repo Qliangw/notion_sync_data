@@ -100,7 +100,10 @@ class ParserHtmlText:
         book_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
 
         book_price_list = [float(s) for s in re.findall(r'-?\d+\.?\d*', book_price)]
-        book_price = book_price_list[0]
+        if len(book_price_list):
+            book_price = book_price_list[0]
+        else:
+            book_price = 0
 
         book_dict[MediaInfo.TITLE.value] = book_title
         book_dict[MediaInfo.AUTHOR.value] = book_author
