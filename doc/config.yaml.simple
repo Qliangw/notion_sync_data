@@ -1,6 +1,19 @@
 # 配置文件
 # 请依照说明填写各项参数
 
+app:
+  # 日志记录类型：SERVER、FILE、CONSOLE，
+  # 默认设置为CONSOLE；
+  # 如果是使用群晖套件建议配置为 SERVER，可将日志输出到群晖的日志中心便于查看；
+  # 如果是python本地运行也设置为FILE，保存日志到文件。
+  log_type: 'CONSOLE'
+
+  # 日志文件的路径，log_type为FILE时生效
+  log_path: 'D:\Development\SourceCode\notion_sync_douban\logs'
+
+  # 群晖日志中心IP和端口，log_type为SERVER时生效。端口一般是514，只需要改动IP为群晖的IP。
+  log_server: 127.0.0.1:514
+
 # 【可选】 建议填写，以免触发触发豆瓣的反爬虫机制浏览器获取
 user_agent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 
@@ -37,4 +50,6 @@ notion:
   music_database_id: ''
   tv_database_id: ''
   movie_database_id: ''
+
+
 
