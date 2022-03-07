@@ -32,8 +32,8 @@ class ParserHtmlText:
                 url_list.append(url.get('href'))
             return url_list
         except Exception as err:
-            log_detail.info(f"解析失败：{err}")
-            return None
+            log_detail.warn(f"【RUN】解析失败：{err}")
+            return []
 
     def get_parser_dict(self, media_type):
         """
@@ -46,8 +46,8 @@ class ParserHtmlText:
             self.__parser(media_type=media_type)
             return self.dict
         except Exception as err:
-            log_detail.info("解析失败")
-            return None
+            log_detail.warn(f"【RUN】解析失败：{err}")
+            return []
 
     def __parser(self, media_type):
         # parser_dict = {}
@@ -56,9 +56,9 @@ class ParserHtmlText:
         if media_type == MediaType.BOOK.value:
             self.dict = self.__get_book_dict()
         elif media_type == MediaType.MOVIE.value:
-            pass
+            log_detail.warn("【RUN】暂不支持电影、电视剧的导入！")
         elif media_type == MediaType.MUSIC.value:
-            pass
+            self.dict = self.__get_music_dict()
         else:
             pass
 
@@ -71,7 +71,7 @@ class ParserHtmlText:
         book_dict = {}
 
         # 书名
-        book_title = self.soup.select('#wrapper > h1 > span')[0].contents[0]  # 书名
+        book_title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
 
         # 作者
         if '作者:' in infos:
@@ -121,8 +121,58 @@ class ParserHtmlText:
     def __movie(self):
         pass
 
-    def __music(self):
-        pass
+    def __get_music_dict(self):
+        log_detail.info("【RUN】解析音乐信息")
+        info = self.soup.select('#info')
+        infos = list(info[0].strings)
+        infos = [i.strip() for i in infos if i.strip() != '']
+        music_dict = {}
+
+        # 歌曲名称
+        music_title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
+
+        # 表演者
+        if '表演者:' in infos:
+            music_performer = infos[infos.index('表演者:') + 1]
+        elif self.soup.select('#info > span > a'):
+            music_performer = self.soup.select('#info > span > a')[0].contents[0]
+        else:
+            music_performer = ''
+        music_performer = ''.join(map(str.strip, music_performer.split('\n')))
+
+        # 流派 专辑类型 介质 发行时间 出版者 条形码
+        music_genre = infos[infos.index('流派:') + 1] if '流派:' in infos else ""
+        album_type = infos[infos.index('专辑类型:') + 1] if '专辑类型:' in infos else ""
+        music_medium = infos[infos.index('介质:') + 1] if '介质:' in infos else ""
+        music_release_date = infos[infos.index('发行时间:') + 1] if '发行时间:' in infos else ""
+        music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
+
+        # 评分 评价数 图片url
+        rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
+        music_rating = rating[0].contents[0] if rating else ""
+        # TODO 评论人数
+        # music_assesses = self.soup.select(
+        #     "#rating_right > div.rating_sum > a")
+        # # print(music_assesses)
+        # music_assess = music_assesses[0].contents[0] if music_assesses else ""
+        music_img = self.soup.select("#mainpic > span > a > img")[0].attrs['src']
+
+        music_dict[MediaInfo.TITLE.value] = music_title
+        music_dict[MediaInfo.PERFORMER.value] = music_performer
+        music_dict[MediaInfo.ALBUM_TYPE.value] = album_type
+        music_dict[MediaInfo.GENRE.value] = music_genre
+        music_dict[MediaInfo.MEDIUM.value] = music_medium
+        music_dict[MediaInfo.RELEASE_DATE.value] = music_release_date
+        music_dict[MediaInfo.ISRC.value] = music_isrc
+        music_dict[MediaInfo.RATING_F.value] = music_rating
+        # music_dict[MediaInfo.ASSESS.value] = music_assess
+        music_dict[MediaInfo.IMG.value] = music_img
+        return music_dict
+
+    def get_music(self):
+        infos = self.__get_music_dict()
+        # log_detail.info(f"{infos}")
+        return infos
 
 
 

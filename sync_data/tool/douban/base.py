@@ -55,7 +55,7 @@ class DouBanBase:
     def __get_headers(self):
         return self.headers
 
-    def get_html_text(self, url=None, user_id=None, media_type="book", media_status="wish", start_number=1):
+    def get_html_text(self, url=None, user_id=None, media_type="book", media_status="wish", start_number=0):
         """
         获取链接的html文档
 

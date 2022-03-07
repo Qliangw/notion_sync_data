@@ -49,6 +49,14 @@ class MediaInfo(Enum):
     SUBHEAD = 'book_subhead'            # 副标题
     PAGES = 'pages'                     # 页数
 
+    # 音乐
+    PERFORMER = "performer"             # 表演者
+    GENRE = "genre"                     # 流派
+    ALBUM_TYPE = "album_type"           # 专辑类型
+    MEDIUM = "medium"                   # 介质
+    RELEASE_DATE = "release_date"       # 发行时间
+    MUSIC_PUB = "music_pub"             # 出版者
+    ISRC = "isrc"                       # 条形码
 
 class MediaXpathParam(Enum):
     """

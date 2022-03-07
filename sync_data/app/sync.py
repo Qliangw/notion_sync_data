@@ -30,14 +30,24 @@ def start_sync(media_type, media_status):
     log_detail.info(f"【RUN】得到用户id：{user_id}")
 
     # 获取notion信息
-    book_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
     token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
+    if media_type == MediaType.BOOK.value:
+        database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
+    elif media_type == MediaType.MUSIC.value:
+        database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
+    elif media_type == MediaType.MOVIE.value:
+        pass
+        # TODO 判断电影和电视剧
+        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TV.value]
+        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MOVIE.value]
+    # 音乐 视频的信息
 
     # 创建一个豆瓣实例
     douban_instance = base.DouBanBase(user_agent=user_agent)
     log_detail.debug("【RUN】创建一个豆瓣实例")
 
-    start_number = 1
+    # 从第0个媒体开始获取
+    start_number = 0
 
     while True:
         page_number = int(start_number / 15 + 1)
@@ -64,31 +74,34 @@ def start_sync(media_type, media_status):
                 now_status = "看过"
             # 查询数据库中是否存在
             notion_media_status = get_notion_media_status(token=token,
-                                                          database_id=book_db_id,
+                                                          database_id=database_id,
                                                           media_url=url)
             # 随机休眠5-10秒钟
             time_number = random.randint(5, 10)
             log_detail.info(f"----------------------------------\n【RUN】随机休眠时间5-10s，本次休眠：{time_number}s")
-            if notion_media_status == "不存在" or notion_media_status != now_status:
+            if notion_media_status == "不存在":
                 html_text = douban_instance.get_html_text(url=url,
                                                           user_id=user_id,
-                                                          media_type=MediaType.BOOK.value,
-                                                          media_status=MediaStatus.WISH.value)
+                                                          media_type=media_type,
+                                                          media_status=media_status)
                 # 创一个详情页实例
                 html_parser = parser.ParserHtmlText(html_text=html_text)
                 # 解析详情页，获取数据字典
-                html_dict = html_parser.get_parser_dict(MediaType.BOOK.value)
+                html_dict = html_parser.get_parser_dict(media_type=media_type)
 
                 # 添加url
                 html_dict[MediaInfo.URL.value] = url
 
                 databases.update_database(data_dict=html_dict,
-                                          database_id=book_db_id,
+                                          database_id=database_id,
                                           token=token,
-                                          media_status=media_status)
+                                          media_status=media_status,
+                                          media_type=media_type)
+            elif notion_media_status != now_status:
+                log_detail.warn("【RUN】豆瓣标记状态已经改变,notion状态同步功能暂不支持！")
             else:
                 log_detail.info(f"【RUN】notion中含有本条数据，已跳过！\n\t媒体链接：{url}")
-        log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
+        log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！\n")
         if url_num > 14:
             start_number += 15
         else:
@@ -100,4 +113,28 @@ def init_database():
     config_dict = Config().get_config()
     token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
     page_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_PAGE_ID.value]
-    create_database(token=token, page_id=page_id)
+    book_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
+    music_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
+    tv_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TV.value]
+    movie_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MOVIE.value]
+    media_type = [MediaType.BOOK.value, MediaType.MUSIC.value, MediaType.MOVIE.value]
+
+    # 书籍
+    if book_db_id == "":
+        create_database(token=token, page_id=page_id, media_type=media_type[0])
+        log_detail.info("【RUN】初始化书籍数据库完成！")
+    else:
+        log_detail.warn(f"【RUN】{media_type[0]}数据库已存在，跳过初始化！")
+
+    # 音乐
+    if music_db_id == "":
+        create_database(token=token, page_id=page_id, media_type=media_type[1])
+    else:
+        log_detail.warn(f"【RUN】{media_type[1]}数据库已存在，跳过初始化！")
+
+    # 影视
+    if tv_db_id == "":
+        create_database(token=token, page_id=page_id, media_type=media_type[2])
+    else:
+        log_detail.warn(f"【RUN】{media_type[2]}数据库已存在，跳过初始化！")
+
