@@ -1,17 +1,17 @@
 # notion_sync_data
 将网络数据同步到notion笔记，方便快速查阅。
 
-- 目前仅支持获取豆瓣书籍的信息
+- 目前仅支持获取豆瓣书籍、音乐（部分）的信息
+- 测试平台：win10、win11、Ubuntu20
+- 开发环境：Python 3.10.2（建议使用使用版本Python3.8+）
 
 > 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
-
-
 
 
 ## 功能
 
 - [x] 获取豆瓣书籍
-- [ ] 获取豆瓣电影
+- [x] 获取豆瓣电影
 - [ ] 获取豆瓣剧集
 - [ ] 获取豆瓣音乐
 - [x] 创建notion数据库
@@ -44,8 +44,13 @@
 
 <img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png" style="zoom: 50%;" />
 
-
 ### 更新日志
+
+#### 2022-03-07
+
+- 增加音乐数据的获取
+
+------
 
 #### 2022-03-06
 
