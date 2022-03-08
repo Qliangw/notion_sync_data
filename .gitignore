@@ -17,6 +17,8 @@ __pychche__/
 开发文档.md
 config.yaml
 test.py
+setup.cfg
+Dockerfile
 
 # 临时文件
 tmp/
