@@ -63,7 +63,7 @@ class ParserHtmlText:
             pass
 
     def __get_book_dict(self):
-        log_detail.info("【RUN】解析书籍信息")
+        log_detail.debug("【RUN】解析书籍信息")
         # 标签名不加任何修饰，类名前加点，id名前加#
         info = self.soup.select('#info')
         infos = list(info[0].strings)
@@ -71,7 +71,7 @@ class ParserHtmlText:
         book_dict = {}
 
         # 书名
-        book_title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
+        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
 
         # 作者
         if '作者:' in infos:
@@ -84,6 +84,7 @@ class ParserHtmlText:
 
         # 出版社 副标题 出版年 页数 定价 ISBN
         book_publisher = infos[infos.index('出版社:') + 1] if '出版社:' in infos else ""
+        book_publisher = book_publisher.replace(',', '')
         book_subhead = infos[infos.index('副标题:') + 1] if '副标题:' in infos else ""
         book_pub_date = infos[infos.index('出版年:') + 1] if '出版年:' in infos else ""
         book_pages = infos[infos.index('页数:') + 1] if '页数:' in infos else ""
@@ -96,7 +97,7 @@ class ParserHtmlText:
         book_rating = rating[0].contents[0] if rating else ""
         book_assesses = self.soup.select(
             "#interest_sectl > div > div.rating_self.clearfix > div > div.rating_sum > span > a > span")
-        book_assess = book_assesses[0].contents[0] if book_assesses else ""
+        book_assess = book_assesses[0].contents[0] if book_assesses else 0
         book_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
 
         book_price_list = [float(s) for s in re.findall(r'-?\d+\.?\d*', book_price)]
@@ -105,7 +106,7 @@ class ParserHtmlText:
         else:
             book_price = 0
 
-        book_dict[MediaInfo.TITLE.value] = book_title
+        book_dict[MediaInfo.TITLE.value] = title
         book_dict[MediaInfo.AUTHOR.value] = book_author
         book_dict[MediaInfo.PUBLISHER.value] = book_publisher
         book_dict[MediaInfo.SUBHEAD.value] = book_subhead
@@ -118,21 +119,26 @@ class ParserHtmlText:
         book_dict[MediaInfo.IMG.value] = book_img
         return book_dict
 
-    def __tv(self):
-        pass
-
     def __movie(self):
-        pass
+        # TODO 影视解析
+        log_detail.debug("【RUN】解析影视信息")
+        # 标签名不加任何修饰，类名前加点，id名前加#
+        info = self.soup.select('#info')
+        infos = list(info[0].strings)
+        infos = [i.strip() for i in infos if i.strip() != '']
+        movie_dict = {}
+        # 影视名称
+        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
 
     def __get_music_dict(self):
-        log_detail.info("【RUN】解析音乐信息")
+        log_detail.debug("【RUN】解析音乐信息")
         info = self.soup.select('#info')
         infos = list(info[0].strings)
         infos = [i.strip() for i in infos if i.strip() != '']
         music_dict = {}
 
         # 歌曲名称
-        music_title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
+        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
 
         # 表演者
         if '表演者:' in infos:
@@ -152,7 +158,7 @@ class ParserHtmlText:
 
         # 评分 评价数 图片url
         rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        music_rating = rating[0].contents[0] if rating else ""
+        music_rating = rating[0].contents[0] if rating else 0
         # TODO 评论人数
         # music_assesses = self.soup.select(
         #     "#rating_right > div.rating_sum > a")
@@ -160,7 +166,7 @@ class ParserHtmlText:
         # music_assess = music_assesses[0].contents[0] if music_assesses else ""
         music_img = self.soup.select("#mainpic > span > a > img")[0].attrs['src']
 
-        music_dict[MediaInfo.TITLE.value] = music_title
+        music_dict[MediaInfo.TITLE.value] = title
         music_dict[MediaInfo.PERFORMER.value] = music_performer
         music_dict[MediaInfo.ALBUM_TYPE.value] = album_type
         music_dict[MediaInfo.GENRE.value] = music_genre
