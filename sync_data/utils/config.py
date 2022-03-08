@@ -46,7 +46,7 @@ class Config(object):
     def load_config(self):
         try:
             if not os.path.exists(self.__config_path):
-                # log_detail.info("【RUN】配置文件不存在，请复制/doc/config.yaml.simple 到本目录为config.yaml，再重新启动")
+                print("【RUN】配置文件不存在，请复制/doc/config.yaml.simple 到本目录为config.yaml，再重新启动")
                 quit()
             with open(self.__config_path, 'r', encoding='utf-8') as file:
                 self.__config = yaml.safe_load(file)

@@ -43,13 +43,10 @@ notion:
   # 在浏览器打开你要导入的notion页面，复制后面的一串数字
   page_id: ''
 
-  # 运行python -init 后会在该页面出现对应的数据库
+  # 运行python run.py -f init 后会在该页面出现对应的数据库
   # 在浏览器打开该数据库，复制该id
   # 如果为空，则插入默认创建的数据库
   book_database_id: ''
   music_database_id: ''
   tv_database_id: ''
   movie_database_id: ''
-
-
-
