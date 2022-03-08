@@ -26,6 +26,11 @@ arg_parser.add_argument('-f',
                         '--func',
                         help='功能参数，init --初始化数据库')
 
+arg_parser.add_argument('-v',
+                        '--version',
+                        default='local',
+                        help='版本信息, local:本地版本，remote:最新版本')
+
 
 if __name__ == '__main__':
 
@@ -39,7 +44,7 @@ if __name__ == '__main__':
             print("不做处理")
             exit()
         else:
-            print("拉取数据")
+            print("----开始拉取数据----")
             start_sync(media_type=media, media_status=status)
     elif media is not None or status is not None:
         log_detail.warn(f'【Tip】您输入的-m参数为< {media} >,请输入< python run.py -h >查看正确指令')

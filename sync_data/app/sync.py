@@ -76,9 +76,6 @@ def start_sync(media_type, media_status):
             notion_media_status = get_notion_media_status(token=token,
                                                           database_id=database_id,
                                                           media_url=url)
-            # 随机休眠5-10秒钟
-            time_number = random.randint(5, 10)
-            log_detail.info(f"----------------------------------\n【RUN】随机休眠时间5-10s，本次休眠：{time_number}s")
             if notion_media_status == "不存在":
                 html_text = douban_instance.get_html_text(url=url,
                                                           user_id=user_id,
@@ -97,11 +94,16 @@ def start_sync(media_type, media_status):
                                           token=token,
                                           media_status=media_status,
                                           media_type=media_type)
+                # 随机休眠5-10秒钟
+                time_number = random.randint(5, 10)
+                log_detail.info(f"【RUN】随机休眠时间5-10s，本次休眠：{time_number}s")
+
             elif notion_media_status != now_status:
                 log_detail.warn("【RUN】豆瓣标记状态已经改变,notion状态同步功能暂不支持！")
             else:
-                log_detail.info(f"【RUN】notion中含有本条数据，已跳过！\n\t媒体链接：{url}")
-        log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！\n")
+                log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
+        log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
+        print("*" * 15)
         if url_num > 14:
             start_number += 15
         else:
@@ -129,12 +131,14 @@ def init_database():
     # 音乐
     if music_db_id == "":
         create_database(token=token, page_id=page_id, media_type=media_type[1])
+        log_detail.info("【RUN】初始化音乐数据库完成！")
     else:
         log_detail.warn(f"【RUN】{media_type[1]}数据库已存在，跳过初始化！")
 
     # 影视
     if tv_db_id == "":
         create_database(token=token, page_id=page_id, media_type=media_type[2])
+        log_detail.info("【RUN】初始化影视数据库完成！")
     else:
         log_detail.warn(f"【RUN】{media_type[2]}数据库已存在，跳过初始化！")
 
