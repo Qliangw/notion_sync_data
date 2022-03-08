@@ -40,6 +40,8 @@ def get_body(data_dict, database_id, media_status, media_type):
         music_status = ""
 
     log_detail.info(f"【RUN】{media_type}数据信息整理为json格式")
+    rat = data_dict[MediaInfo.RATING_F.value]
+    rating = float(rat) if rat == "" else 0
     if media_type == MediaType.MUSIC.value:
         body = {
             "parent": {
@@ -65,7 +67,7 @@ def get_body(data_dict, database_id, media_status, media_type):
                     }]
                 },
                 "评分": {
-                    "number": float(data_dict[MediaInfo.RATING_F.value])
+                    "number": rating
                 },
                 "表演者": {
                     "rich_text": [{
@@ -121,7 +123,7 @@ def get_body(data_dict, database_id, media_status, media_type):
                     }]
                 },
                 "评分": {
-                    "number": float(data_dict[MediaInfo.RATING_F.value])
+                    "number": rating
                 },
                 "作者": {
                     "rich_text": [{
@@ -280,6 +282,8 @@ def update_database(data_dict, database_id, token, media_status, media_type):
         if res.status_code == 200:
             log_detail.info(f"【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》成功")
             return None
+        else:
+            log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}')
     except Exception as err:
         log_detail.error(f"【RUN】导入数据库错误：{err}")
         return None
