@@ -229,9 +229,46 @@ def create_database(token, page_id, media_type):
                     {"name": "⭐⭐⭐⭐", "color": "yellow"},
                     {"name": "⭐⭐⭐⭐⭐", "color": "yellow"}]}},
             }}
+    elif media_type == MediaType.MOVIE.value:
+        """
+        类型是获取豆瓣中的信息
+            剧情 / 动作 / 科幻/ 犯罪
+        分类是个人主观分的
+            电视剧、电影、动画片（指的是电影）、动漫（剧集）、纪录片（电影和电视剧）
+        """
+        create_db_data = {
+            "parent": {"type": "page_id", "page_id": f"{page_id}"},
+            "title": [{"type": "text", "text": {"content": "豆瓣影视库"}}],
+            "icon": {"type": "emoji", "emoji": "🎬"},
+            "properties": {
+                "名字": {"title": {}},
+                "评分": {"number": {}},
+                "豆瓣链接": {"url": {}},
+                "导演": {"rich_text": {}},
+                "编剧": {"rich_text": {}},
+                "主演": {"multi_select": {}},
+                "类型": {"multi_select": {}},
+                "分类": {"select": {}},
+                "国家地区": {"multi_select": {}},
+                "IMDb": {"url": {}},
+                "封面": {"files": []},
+                "时间": {"select": {}},
+                "片长": {"number": {}},
+                "评分人数": {"number": {}},
+                "简介": {"rich_text": {}},
+                "标记状态": {"select": {}},
+                "标记时间": {"date": {}},
+                "个人评分": {"select": {"options": [
+                    {"name": "⭐", "color": "yellow"},
+                    {"name": "⭐⭐", "color": "yellow"},
+                    {"name": "⭐⭐⭐", "color": "yellow"},
+                    {"name": "⭐⭐⭐⭐", "color": "yellow"},
+                    {"name": "⭐⭐⭐⭐⭐", "color": "yellow"}]}},
+            }}
     else:
-        create_db_data = {}
+        # create_db_data = {}
         log_detail.warn("【RUN】暂不支持其他数据库的创建")
+        return 0
 
     try:
         if create_db_data:
@@ -249,7 +286,7 @@ def create_database(token, page_id, media_type):
                 return database_id
             else:
                 log_detail.warn("【RUN】创建数据库失败，请检查是否页面有授权给【集权】，再重新使用本程序")
-                input("请按Enter键结束！")
+                # input("请按Enter键结束！")
                 exit()
         else:
             log_detail.warn(f"【RUN】跳过创建{media_type}数据库")
@@ -280,12 +317,15 @@ def update_database(data_dict, database_id, token, media_status, media_type):
                        headers=page_data.get_headers(),
                        params=body)
         if res.status_code == 200:
-            log_detail.info(f"【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》成功")
+            log_detail.info(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{data_dict["url"]}')
             return None
         else:
-            log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}')
+            log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}！媒体链接：{data_dict["url"]}')
     except Exception as err:
-        log_detail.error(f"【RUN】导入数据库错误：{err}")
-        return None
+        try:
+            log_detail.error(f'【RUN】导入数据库错误：{err}！媒体链接：{data_dict["url"]}')
+            return None
+        except Exception as error:
+            log_detail.error(f'【RUN】data_dict 参数有误！{error}')
 
 
