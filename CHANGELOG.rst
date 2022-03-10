@@ -13,6 +13,12 @@
 
 [Unreleased]
 ============
+`[v0.0.7-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.7-alpha...v0.0.7-beta>`_ - 2022-03-10
+========================
+
+- feat: 初始化数据库后，自动保存数据库id
+- fix(run): 解决添加版本信息后参数冲突的问题
+
 `[v0.0.7-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.6-beta...v0.0.7-alpha>`_ - 2022-03-10
 ========================
 
