@@ -86,6 +86,68 @@ def save_config(new_config):
     return Config.get_instance().save_cnfig(new_config)
 
 
+# 自动配置notion数据库id
+def auto_config_database(media_type, database_id):
+    """
+    自动配置数据库id
+
+    :param media_type: 'book', 'music', 'movie'
+    :param database_id: 32位id
+    :return:
+    """
+
+    try:
+        if media_type in ['book', 'music', 'movie'] and len(database_id) == 32:
+            auto_conf = get_auto_config()
+            auto_conf_path = get_auto_conf_path()
+            auto_conf[f'{media_type}_database_id'] = database_id
+            with open(auto_conf_path, mode='w', encoding='utf-8') as file:
+                yaml.dump(auto_conf, file, allow_unicode=True)
+            return "succeed"
+        else:
+            log_detail.warn(
+                f"【RUN】传入参数media_type:<{media_type}>,db_id:<{database_id}>,数据库id长度为:<{len(database_id)}>存在错误")
+            return "failed"
+    except Exception as err:
+        log_detail.error(f"【RUN】{err}")
+        return "failed"
+
+
+def save_auto_config(new_config):
+    try:
+        auto_conf_path = get_auto_conf_path()
+        with open(auto_conf_path, mode='w', encoding='utf-8') as file:
+            yaml.dump(new_config, file, allow_unicode=True)
+        return "succeed"
+    except Exception as err:
+        log_detail.error(f"【RUN】自动保存配置失败：{err}")
+        return "failed"
+
+def get_auto_conf_path():
+    base_path = Config().get_config_path()
+    auto_conf_path = base_path.replace('config', 'auto')
+    # log_detail.info(f"【RUN】自动配置路径为：\t{auto_conf_path}")
+    return auto_conf_path
+
+
+def get_auto_config():
+    auto_conf_path = get_auto_conf_path()
+
+    if not os.path.exists(auto_conf_path):
+        log_detail.info("【RUN】自动配置文件不存在，将会自动创建auto.yaml文件")
+        auto_config = {"book_database_id": "",
+                       "music_database_id": "",
+                       "movie_database_id": ""}
+        with open(auto_conf_path, mode='w', encoding='utf-8') as file:
+            yaml.dump(auto_config, file, allow_unicode=True)
+        return auto_config
+    else:
+        log_detail.info("【RUN】读取配置文件")
+        with open(auto_conf_path, 'r', encoding='utf-8') as file:
+            auto_conf = yaml.safe_load(file)
+        return auto_conf
+
+
 # 检查配置信息
 
 
@@ -93,5 +155,3 @@ def save_config(new_config):
 if __name__ == '__main__':
     config_dict = get_config()
     print(config_dict)
-
-

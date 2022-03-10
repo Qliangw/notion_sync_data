@@ -43,7 +43,6 @@ if __name__ == '__main__':
     media = args.media
     status = args.status
     func = args.func
-    version = args.version
 
     if media in ['book', 'music', 'tv', 'movie'] and status in ['do', 'wish', 'collect', 'all']:
         if func is not None:
