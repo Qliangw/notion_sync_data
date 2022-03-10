@@ -14,7 +14,7 @@ from sync_data.tool.notion import databases
 from sync_data.tool.notion.databases import create_database
 from sync_data.tool.notion.query import get_notion_media_status
 from sync_data.utils import log_detail
-from sync_data.utils.config import Config
+from sync_data.utils.config import Config, auto_config_database, get_auto_config, save_auto_config
 
 
 def start_sync(media_type, media_status):
@@ -29,18 +29,17 @@ def start_sync(media_type, media_status):
     user_id = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_USER_ID.value]
     log_detail.info(f"【RUN】得到用户id：{user_id}")
 
-    # 获取notion信息
+    # 获取notion数据库的信息
     token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
+    auto_config = get_auto_config()
     if media_type == MediaType.BOOK.value:
-        database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
+        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
+        database_id = auto_config[ConfigName.NOTION_BOOK.value]
     elif media_type == MediaType.MUSIC.value:
-        database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
+        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
+        database_id = auto_config[ConfigName.NOTION_MUSIC.value]
     elif media_type == MediaType.MOVIE.value:
-        pass
-        # TODO 判断电影和电视剧
-        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TV.value]
-        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MOVIE.value]
-    # 音乐 视频的信息
+        database_id = auto_config[ConfigName.NOTION_MOVIE.value]
 
     # 创建一个豆瓣实例
     douban_instance = base.DouBanBase(user_agent=user_agent)
@@ -112,33 +111,60 @@ def start_sync(media_type, media_status):
 
 
 def init_database():
+    """
+    初始化数据库
+    :return:
+    """
     config_dict = Config().get_config()
     token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
     page_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_PAGE_ID.value]
+    media_type_list = [MediaType.BOOK.value, MediaType.MUSIC.value, MediaType.MOVIE.value]
+
+    #########################################################
+    # 下个版本删除
     book_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
     music_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
-    tv_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TV.value]
+    # tv_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TV.value]
     movie_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MOVIE.value]
     media_type = [MediaType.BOOK.value, MediaType.MUSIC.value, MediaType.MOVIE.value]
+    auto_conf = get_auto_config()
+    log_detail.info("【RUN】将个人数据库配置复制到auto.yaml中，将来版本会移除移动配置的功能！")
+    auto_conf[ConfigName.NOTION_BOOK.value] = book_db_id if len(book_db_id) == 32 else ""
+    auto_conf[ConfigName.NOTION_MUSIC.value] = music_db_id if len(music_db_id) == 32 else ""
+    auto_conf[ConfigName.NOTION_MOVIE.value] = movie_db_id if len(movie_db_id) == 32 else ""
+    save_auto_config(auto_conf)
+    #########################################################
 
+    auto_config = get_auto_config()
     # 书籍
-    if book_db_id == "":
-        create_database(token=token, page_id=page_id, media_type=media_type[0])
-        log_detail.info("【RUN】初始化书籍数据库完成！")
+    if auto_config[ConfigName.NOTION_BOOK.value] == "" or len(auto_config[ConfigName.NOTION_BOOK.value]) != 32:
+        database_id = create_database(token=token, page_id=page_id, media_type=media_type_list[0])
+        database_id = database_id.replace('-', '')
+        r = auto_config_database(media_type=media_type_list[0], database_id=database_id)
+        if r == 'succeed':
+            log_detail.info(f"【RUN】初始化<{media_type_list[0]}>数据库完成！")
     else:
-        log_detail.warn(f"【RUN】{media_type[0]}数据库已存在，跳过初始化！")
+        log_detail.warn(f"【RUN】<{media_type_list[0]}>数据库已存在，跳过初始化！")
 
     # 音乐
-    if music_db_id == "":
-        create_database(token=token, page_id=page_id, media_type=media_type[1])
-        log_detail.info("【RUN】初始化音乐数据库完成！")
+    if auto_config[ConfigName.NOTION_MUSIC.value] == "" or len(auto_config[ConfigName.NOTION_MUSIC.value]) != 32:
+        database_id = create_database(token=token, page_id=page_id, media_type=media_type_list[1])
+        database_id = database_id.replace('-', '')
+        r = auto_config_database(media_type=media_type_list[1], database_id=database_id)
+        if r == 'succeed':
+            log_detail.info(f"【RUN】初始化<{media_type_list[1]}>数据库完成！")
     else:
-        log_detail.warn(f"【RUN】{media_type[1]}数据库已存在，跳过初始化！")
+        log_detail.warn(f"【RUN】<{media_type_list[1]}>数据库已存在，跳过初始化！")
 
     # 影视
-    if tv_db_id == "":
-        create_database(token=token, page_id=page_id, media_type=media_type[2])
-        log_detail.info("【RUN】初始化影视数据库完成！")
+    if auto_config[ConfigName.NOTION_MOVIE.value] == "" or len(auto_config[ConfigName.NOTION_MOVIE.value]) != 32:
+        log_detail.info(f"【RUN】暂不支持<{media_type_list[2]}>数据库的初始化")
+        return 0
+        # database_id = create_database(token=token, page_id=page_id, media_type=media_type[2])
+        # database_id = database_id.replace('-', '')
+        # r = auto_config_database(media_type=media_type[2], database_id=database_id)
+        # if r == 'succeed':
+        #     log_detail.info(f"【RUN】初始化<{media_type[2]}>数据库完成！")
     else:
-        log_detail.warn(f"【RUN】{media_type[2]}数据库已存在，跳过初始化！")
+        log_detail.warn(f"【RUN】<{media_type_list[2]}>数据库已存在，跳过初始化！")
 
