@@ -13,6 +13,13 @@
 
 [Unreleased]
 ============
+`[v0.0.7-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.6-beta...v0.0.7-alpha>`_ - 2022-03-10
+
+- fix(run.py): `issues-4 <https://github.com/Qliangw/notion_sync_data/issues/4>`_ ，使用-s all参数报错的问题
+- feat: 通过-v 或者--version可查询版本号
+- docs: update
+
+========================
 [v0.0.6-beta] - 2022-03-08
 ========================
 [0.0.6-alpha] - 2022-03-08
