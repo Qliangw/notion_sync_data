@@ -13,6 +13,10 @@ from sync_data.utils.config import Config
 from sync_data.version import version as ver
 
 
+def get_version():
+    return ver
+
+
 # 命令行参数
 arg_parser = argparse.ArgumentParser(description="导入数据至notion数据库")
 arg_parser.add_argument('-m',
@@ -25,6 +29,12 @@ arg_parser.add_argument('-s',
 arg_parser.add_argument('-f',
                         '--func',
                         help='功能参数，init --初始化数据库')
+
+arg_parser.add_argument('-v',
+                        '--version',
+                        action='version',
+                        version=get_version(),
+                        help='版本信息')
 
 
 if __name__ == '__main__':
