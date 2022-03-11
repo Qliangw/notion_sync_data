@@ -55,10 +55,11 @@ class ParserHtmlText:
         # self.soup = BeautifulSoup(self.html, 'html.parser')
         if media_type == MediaType.BOOK.value:
             self.dict = self.__get_book_dict()
-        elif media_type == MediaType.MOVIE.value:
-            log_detail.warn("【RUN】暂不支持电影、电视剧的导入！")
         elif media_type == MediaType.MUSIC.value:
             self.dict = self.__get_music_dict()
+        elif media_type == MediaType.MOVIE.value:
+            # log_detail.warn("【RUN】暂不支持电影、电视剧的导入！")
+            self.dict = self.__get_movie_dict()
         else:
             pass
 
@@ -176,7 +177,88 @@ class ParserHtmlText:
         infos = [i.strip() for i in infos if i.strip() != '']
         movie_dict = {}
         # 影视名称
-        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
+        title = self.soup.select('#wrapper > div > h1')
+        titles = list(title[0].strings)
+        titles = [i.strip() for i in titles if i.strip() != '']
+        movie_title = ''.join(titles)
+
+        # 导演
+        if '导演' in infos:
+            movie_director = multiple_infos_parser(infos, '导演', 2)
+        else:
+            movie_director = ""
+
+        # 编剧 主演 类型
+        screenwriter = multiple_infos_parser(infos, "编剧", 2)
+        starring = multiple_infos_parser(infos, "主演", 2)
+        movie_type = multiple_infos_parser(infos, "类型:" , 1)
+
+        # 国家或地区
+        country_or_region = infos[infos.index("制片国家/地区:") + 1]
+        country_or_region_list = country_or_region.split('/')
+        c_or_r = []
+        for i in country_or_region_list:
+            c_or_r.append(i.strip(' '))
+
+        # 语言
+        language = infos[infos.index("语言:") + 1]
+        language_list_tmp = language.split('/')
+        language_list = []
+        for i in language_list_tmp:
+            language_list.append(i.strip(' '))
+
+        # 分类 电影和电视剧 以及 动画片（电影）和动漫（剧集）
+        if '上映时间:' in infos or '上映日期:' in infos:
+            if '动画' in movie_type:
+                movie_categories = "动画片"
+            else:
+                movie_categories = '电影'
+        elif "首播:" in infos or "首播时间:" in infos:
+            if '动画' in movie_type:
+                movie_categories = "动漫"
+            else:
+                movie_categories = "电视剧"
+        else:
+            movie_categories = "未知"
+
+        imdb = infos[infos.index('IMDb:') + 1]
+
+        # 评分 评价数 图片网址
+        # rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
+        # movie_rating = rating[0].contents[0] if rating else ""
+        rating_info = self.soup.select("#interest_sectl > div > div.rating_self.clearfix")
+        rating_infos = list(rating_info[0].strings)
+        rating_infos = [i.strip() for i in rating_infos if i.strip() != '']
+        if len(rating_infos) > 2:
+            movie_rating = rating_infos[0]
+            movie_assess = rating_infos[1]
+        else:
+            movie_rating = 0
+            movie_assess = 0
+
+        # movie_assess = movie_assesses[0].contents[0] if movie_assesses else 0
+        movie_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
+
+        related_info = self.soup.select("#content > div > div.article > div > div.indent > span")
+        related_infos = list(related_info[0].strings)
+        related_infos = [i.strip() for i in related_infos if i.strip() != '']
+        # print(rating_infos)
+
+        movie_dict[MediaInfo.TITLE.value] = movie_title
+        movie_dict[MediaInfo.DIRECTOR.value] = movie_director
+        movie_dict[MediaInfo.SCREENWRITER.value] = screenwriter
+        movie_dict[MediaInfo.STARRING.value] = starring
+        movie_dict[MediaInfo.MOVIE_TYPE.value] = movie_type
+        movie_dict[MediaInfo.C_OR_R.value] = c_or_r
+        movie_dict[MediaInfo.LANGUAGE.value] = language_list
+        movie_dict[MediaInfo.CATEGORIES.value] = movie_categories
+        movie_dict[MediaInfo.IMDB.value] = imdb
+        movie_dict[MediaInfo.RATING_F.value] = float(movie_rating)
+        movie_dict[MediaInfo.ASSESS.value] = int(movie_assess)
+        movie_dict[MediaInfo.IMG.value] = movie_img
+        movie_dict[MediaInfo.RELATED.value] = related_infos
+
+        return movie_dict
 
 
 
@@ -185,5 +267,21 @@ class ParserHtmlText:
         # log_detail.info(f"{infos}")
         return infos
 
-
+def multiple_infos_parser(str_dict, str_key, next_number):
+    str_list = []
+    try:
+        str_list = []
+        first_index = str_dict.index(str_key) + next_number
+        str_list.append(str_dict[first_index])
+        next_index = first_index
+        while True:
+            if str_dict[next_index + 1] == '/':
+                next_index += 2
+                str_list.append(str_dict[next_index])
+            else:
+                break
+        return str_list
+    except Exception as err:
+        log_detail.error(f"【RUN】未解析到数据：{err}")
+        return  str_list
 

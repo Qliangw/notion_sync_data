@@ -58,6 +58,18 @@ class MediaInfo(Enum):
     MUSIC_PUB = "music_pub"             # 出版者
     ISRC = "isrc"                       # 条形码
 
+    # 电影
+    DIRECTOR = "director"
+    SCREENWRITER = "screenwriter"
+    STARRING = "starring"
+    MOVIE_TYPE = "movie_type"
+    C_OR_R = "country_or_region"
+    LANGUAGE = "language"
+    CATEGORIES = "Categories"
+    IMDB = "IMDb"
+    RELATED = "related_infos"
+
+
 class MediaXpathParam(Enum):
     """
     提取html的参数
