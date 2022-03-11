@@ -13,6 +13,15 @@ from sync_data.utils import log_detail
 from sync_data.tool.notion import base
 from sync_data.utils.http_utils import RequestUtils
 
+def get_multi_select_body(data_list):
+    str_key = '{"name": "xxx"}'
+    new_list_tmp = []
+    for i in data_list:
+        new_tmp = str_key.replace('xxx', i)
+        new_list_tmp.append(new_tmp)
+    # print(new_list_tmp)
+    str_new = ','.join(new_list_tmp)
+    return  "[" + str_new + "]"
 
 def get_body(data_dict, database_id, media_status, media_type):
     """
@@ -94,7 +103,101 @@ def get_body(data_dict, database_id, media_status, media_type):
         }
         return body
     elif media_type == MediaType.MOVIE.value:
-        pass
+
+        # 导演 编剧 主演
+        text_director = ' / '.join(data_dict[MediaInfo.DIRECTOR.value])
+        text_screenwriter = ' / '.join(data_dict[MediaInfo.SCREENWRITER.value])
+        text_starring = ' / '.join(data_dict[MediaInfo.STARRING.value])
+        str_type = get_multi_select_body(data_dict[MediaInfo.MOVIE_TYPE.value])
+        json_type = json.loads(str_type)
+        str_c_or_r = get_multi_select_body(data_dict[MediaInfo.C_OR_R.value])
+        json_c_or_r = json.loads(str_c_or_r)
+        body = {
+            "parent": {
+                "type": "database_id",
+                "database_id": f"{database_id}"
+            },
+            "properties": {
+                "名字": {
+                    "title": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.TITLE.value]
+                        }
+                    }]
+                },
+                "导演": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": text_director
+                        }
+                    }]
+                },
+                "编剧": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": text_screenwriter
+                        }
+                    }]
+                },
+                "主演": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": text_starring
+                        }
+                    }]
+                },
+                "类型": {
+                    "multi_select": json_type
+                },
+                "国家地区": {
+                    "multi_select": json_c_or_r
+                },
+                "IMDb": {
+                    "url": f"https://www.imdb.com/title/{data_dict[MediaInfo.IMDB.value]}"
+                },
+                "评分": {
+                    "number": data_dict[MediaInfo.RATING_F.value]
+                },
+                "评分人数": {
+                    "number": int(data_dict[MediaInfo.ASSESS.value])
+                },
+                "标记状态": {
+                    "select": {
+                        "name": f"{status}"
+                    }
+                },
+                "分类": {
+                    "select": {
+                        "name": f"{data_dict[MediaInfo.CATEGORIES.value]}"
+                    }
+                },
+                "简介": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.RELATED.value][0]
+                        }
+                    }]
+                },
+                "封面": {
+                    "files": [{
+                        "type": "external",
+                        "name": data_dict[MediaInfo.IMG.value][-15:],
+                        "external": {
+                            "url": data_dict[MediaInfo.IMG.value]
+                        }
+                    }]
+                },
+                "豆瓣链接": {
+                    "url": f"{data_dict[MediaInfo.URL.value]}"
+                }
+            }
+        }
+        return body
     elif media_type == MediaType.BOOK.value:
         body = {
             "parent": {
@@ -246,7 +349,7 @@ def create_database(token, page_id, media_type):
                 "豆瓣链接": {"url": {}},
                 "导演": {"rich_text": {}},
                 "编剧": {"rich_text": {}},
-                "主演": {"multi_select": {}},
+                "主演": {"rich_text": {}},
                 "类型": {"multi_select": {}},
                 "分类": {"select": {}},
                 "国家地区": {"multi_select": {}},
@@ -319,7 +422,5 @@ def update_database(data_dict, database_id, token, media_status, media_type):
             log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}！媒体链接：{data_dict["url"]}')
     except Exception as err:
         log_detail.error(f'【RUN】导入数据库错误：{err}！媒体链接：{data_dict["url"]}')
-    finally:
-        log_detail.error(f'【RUN】data_dict 参数有误!')
 
 

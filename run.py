@@ -4,12 +4,8 @@
 # @Function: 程序入口
 
 import argparse
-import os
-import sys
-
 from sync_data.app.sync import start_sync, init_database
 from sync_data.utils import log_detail
-from sync_data.utils.config import Config
 from sync_data.version import version as ver
 
 
@@ -21,7 +17,7 @@ def get_version():
 arg_parser = argparse.ArgumentParser(description="导入数据至notion数据库")
 arg_parser.add_argument('-m',
                         '--media',
-                        help='输入模式，book/movie/tv/music')
+                        help='输入模式，book/movie/music')
 arg_parser.add_argument('-s',
                         '--status',
                         help='输入媒体状态，wish/do/collect/all')
@@ -44,14 +40,11 @@ if __name__ == '__main__':
     status = args.status
     func = args.func
 
-    if media in ['book', 'music', 'tv', 'movie'] and status in ['do', 'wish', 'collect', 'all']:
+    if media in ['book', 'music', 'movie'] and status in ['do', 'wish', 'collect', 'all']:
         if func is not None:
             log_detail.warn("【Tip】参数过多，不做处理，退出程序")
             exit()
         else:
-            if media in ['tv', 'movie']:
-                log_detail.warn("【Tip】暂不支持该功能，请调整命令，再试一次！")
-                exit()
             if status == 'all':
                 for i in ['do', 'wish', 'collect']:
                     log_detail.info(f"【RUN】开始获取{media}的{i}状态信息")
