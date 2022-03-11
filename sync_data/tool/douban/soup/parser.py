@@ -119,17 +119,6 @@ class ParserHtmlText:
         book_dict[MediaInfo.IMG.value] = book_img
         return book_dict
 
-    def __movie(self):
-        # TODO 影视解析
-        log_detail.debug("【RUN】解析影视信息")
-        # 标签名不加任何修饰，类名前加点，id名前加#
-        info = self.soup.select('#info')
-        infos = list(info[0].strings)
-        infos = [i.strip() for i in infos if i.strip() != '']
-        movie_dict = {}
-        # 影视名称
-        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
-
     def __get_music_dict(self):
         log_detail.debug("【RUN】解析音乐信息")
         info = self.soup.select('#info')
@@ -177,6 +166,19 @@ class ParserHtmlText:
         # music_dict[MediaInfo.ASSESS.value] = music_assess
         music_dict[MediaInfo.IMG.value] = music_img
         return music_dict
+
+
+    def __get_movie_dict(self):
+        log_detail.debug("【RUN】解析影视信息")
+        # 标签名不加任何修饰，类名前加点，id名前加#
+        info = self.soup.select('#info')
+        infos = list(info[0].strings)
+        infos = [i.strip() for i in infos if i.strip() != '']
+        movie_dict = {}
+        # 影视名称
+        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
+
+
 
     def get_music(self):
         infos = self.__get_music_dict()
