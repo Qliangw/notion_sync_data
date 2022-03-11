@@ -13,6 +13,12 @@
 
 [Unreleased]
 ============
+`[v0.1.0-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.7-beta...v0.1.0-alpha>`_ - 2022-03-11
+========================
+
+- feat: 影视信息的导入
+- fix: 因网络问题导致的程序异常
+
 `[v0.0.7-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.7-alpha...v0.0.7-beta>`_ - 2022-03-10
 ========================
 
