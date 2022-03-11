@@ -113,6 +113,7 @@ def start_sync(media_type, media_status):
     # 获取notion数据库的信息
     token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
     auto_config = get_auto_config()
+    database_id = ''
     if media_type == MediaType.BOOK.value:
         # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
         database_id = auto_config[ConfigName.NOTION_BOOK.value]
@@ -172,9 +173,8 @@ def init_database():
     except Exception as err:
         log_detail.error(f"【RUN】config配置参数问题：{err}")
     #########################################################
-
     auto_config = get_auto_config()
-    log_detail.warn(auto_config)
+    log_detail.debug(auto_config)
     # 书籍
     if auto_config[ConfigName.NOTION_BOOK.value] == "" or len(auto_config[ConfigName.NOTION_BOOK.value]) != 32:
         database_id = create_database(token=token, page_id=page_id, media_type=media_type_list[0])

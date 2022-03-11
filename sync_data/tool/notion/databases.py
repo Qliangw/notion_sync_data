@@ -174,7 +174,7 @@ def create_database(token, page_id, media_type):
     :return: databases_id，可以通过该id定位到数据库
     """
     # TODO 添加书 影 音 数据库
-
+    create_db_data = {}
     if media_type == MediaType.BOOK.value:
         create_db_data = {
             "parent": {"type": "page_id", "page_id": f"{page_id}"},
@@ -266,9 +266,7 @@ def create_database(token, page_id, media_type):
                     {"name": "⭐⭐⭐⭐⭐", "color": "yellow"}]}},
             }}
     else:
-        # create_db_data = {}
-        log_detail.warn("【RUN】暂不支持其他数据库的创建")
-        return 0
+        exit("暂不支持其他数据库的创建")
 
     try:
         if create_db_data:
@@ -285,13 +283,11 @@ def create_database(token, page_id, media_type):
                 database_id = eval(res.text.replace(":null", ":'null'").replace(":false", ":'false'"))["id"]
                 return database_id
             else:
-                log_detail.warn("【RUN】创建数据库失败，请检查是否页面有授权给【集权】，再重新使用本程序")
-                # input("请按Enter键结束！")
-                exit()
+                exit("创建数据库失败，请检查是否页面有授权给【集权】，再重新使用本程序")
         else:
             log_detail.warn(f"【RUN】跳过创建{media_type}数据库")
     except Exception as err:
-        log_detail.error(f"【RUN】创建数据库错误{err}")
+        exit(f"网络请求错误:{err}")
 
 
 def update_database(data_dict, database_id, token, media_status, media_type):
@@ -322,10 +318,8 @@ def update_database(data_dict, database_id, token, media_status, media_type):
         else:
             log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}！媒体链接：{data_dict["url"]}')
     except Exception as err:
-        try:
-            log_detail.error(f'【RUN】导入数据库错误：{err}！媒体链接：{data_dict["url"]}')
-            return None
-        except Exception as error:
-            log_detail.error(f'【RUN】data_dict 参数有误！{error}')
+        log_detail.error(f'【RUN】导入数据库错误：{err}！媒体链接：{data_dict["url"]}')
+    finally:
+        log_detail.error(f'【RUN】data_dict 参数有误!')
 
 
