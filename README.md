@@ -69,7 +69,7 @@ sync_data/
 
 ## 鸣谢
 
-- 感谢 [jarrett-au](https://github.com/jarrett-au/douban2noition )
-- 感谢 [Geetheshe](https://github.com/Geetheshe/DoubanMovieListBackUpToNotion ) 
+- 感谢 [jarrett-au](https://github.com/jarrett-au/douban2noition)
+- 感谢 [Geetheshe](https://github.com/Geetheshe/DoubanMovieListBackUpToNotion) 
 - 感谢 [jxxghp](https://github.com/jxxghp/nas-tools)
 - 感谢靓仔
