@@ -2,10 +2,10 @@
 # 请依照说明填写各项参数
 
 app:
-  # 日志记录类型：SERVER、FILE、CONSOLE，
-  # 默认设置为CONSOLE；
-  # 如果是使用群晖套件建议配置为 SERVER，可将日志输出到群晖的日志中心便于查看；
-  # 如果是python本地运行也设置为FILE，保存日志到文件。
+  # SERVER：可将日志输出到群晖的日志中心便于查看，必须log_server必须配置
+  # FILE：保存日志到文件，则下面的log_path必须配置
+  # CONSOLE：打印到控制台
+  # 【必填】日志记录类型：SERVER、FILE、CONSOLE，默认设置为CONSOLE；
   log_type: 'CONSOLE'
 
   # 日志文件的路径，log_type为FILE时生效
@@ -21,16 +21,16 @@ user_agent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 douban:
   # 【必填】
   user_id: ''
-  # 可以为空
+  # 【预留】可以为空
   cookies: ''
-
-  # 【必填】all | part，选择all后自动忽略 day status media_type
-  select: 'all'
-  # 多少天内的
+  # 【预留】多少天内的
   day: 180
-  # 1 - 想看（wish) | 2 - 再看（do）| 3 - 看过（collect）
+
+  # 【已弃用】all | part，选择all后自动忽略 day status media_type
+  select: 'all'
+  # 【已弃用】1 - 想看（wish) | 2 - 再看（do）| 3 - 看过（collect）
   status: 1
-  # 1-书 | 2-电影 | 3-电视剧 | 4-音乐
+  # 【已弃用】1-书 | 2-电影 | 3-电视剧 | 4-音乐
   media_type: 1
 
 
@@ -43,9 +43,7 @@ notion:
   # 在浏览器打开你要导入的notion页面，复制后面的一串数字
   page_id: ''
 
-  # 运行python run.py -f init 后会在该页面出现对应的数据库
-  # 在浏览器打开该数据库，复制该id
-  # 如果为空，则插入默认创建的数据库
+  # 【已弃用】
   book_database_id: ''
   music_database_id: ''
   tv_database_id: ''
