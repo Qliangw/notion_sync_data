@@ -18,6 +18,7 @@
 **TODO**
 
 - [ ] 添加GUI或者Web
+- [ ] 适配Win和Mac的可执行程序
 - [ ] [营养成分表](https://www.tianapi.com/apiview/121)
 
 ## [更新日志](https://github.com/Qliangw/notion_sync_data/blob/main/CHANGELOG.rst)
@@ -26,43 +27,9 @@
 
 ## 页面展示
 
-数据内容包括【书封面、标题、作者、评分、评分人数、出版社、出版年份、标记状态、ISBN、豆瓣链接、~~短评~~、~~标记时间~~、~~类型~~】
+[豆瓣书单](https://ptest.notion.site/880fef10dbd34a54a0072ae43544946f?v=fa44930d5a2340a7bb62de25edad93b3)
 
-### 表格模式
-
-<img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/databases.png" style="zoom:80%;" />
-
-### 封面模式
-
-<img src="https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/gallery.png" style="zoom: 50%;" />
-
-
-## 目录结构
-
-```
-run.py # 主程序
-|
-sync_data/
-├── app/
-│   └── sync.py
-├── data/
-│   └── user_config.py
-├── test/
-│   └── test.py
-├── tool/
-│   ├── douban/			# 豆瓣获取信息工具
-│   │   ├── base.py
-│   │   ├── data/
-│   │   └── soup/
-│   └── notion/			# notion接口
-│       ├── base.py
-│       ├── databases.py
-│       └── query.py
-└── utils/
-    ├── config.py
-    ├── http_utils.py
-    └── log_detail.py
-```
+[豆瓣影视](https://ptest.notion.site/149aeb4ecc62484e85d00f19520cf38b?v=754fe0acbed643cca8efa9a881c225d3)
 
 
 ## 鸣谢
