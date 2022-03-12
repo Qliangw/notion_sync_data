@@ -39,6 +39,7 @@ class MediaInfo(Enum):
     TAG_LIST = "tag_list"               # 标签
     RATING_F = "rating"                 # 评分
     ASSESS = 'assess'                   # 评价数
+    RELATED = "related_infos"
 
     # 书籍
     AUTHOR = "author"                   # 作者
@@ -67,7 +68,6 @@ class MediaInfo(Enum):
     LANGUAGE = "language"
     CATEGORIES = "Categories"
     IMDB = "IMDb"
-    RELATED = "related_infos"
 
 
 class MediaXpathParam(Enum):

@@ -49,8 +49,8 @@ def get_body(data_dict, database_id, media_status, media_type):
         music_status = ""
 
     log_detail.info(f"【RUN】{media_type}数据信息整理为json格式")
-    rat = data_dict[MediaInfo.RATING_F.value]
-    rating = float(rat) if rat == "" else 0
+    rating = data_dict[MediaInfo.RATING_F.value]
+    # rating = float(rat) if rat == "" else 0
     if media_type == MediaType.MUSIC.value:
         body = {
             "parent": {
@@ -179,7 +179,7 @@ def get_body(data_dict, database_id, media_status, media_type):
                     "rich_text": [{
                         "type": "text",
                         "text": {
-                            "content": data_dict[MediaInfo.RELATED.value][0]
+                            "content": data_dict[MediaInfo.RELATED.value]
                         }
                     }]
                 },

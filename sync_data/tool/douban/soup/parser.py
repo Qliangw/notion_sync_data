@@ -94,18 +94,19 @@ class ParserHtmlText:
         book_isbn = infos[infos.index('ISBN:') + 1] if 'ISBN:' in infos else ""
 
         # 评分 评价数 图片网址
-        rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        book_rating = rating[0].contents[0] if rating else ""
-        book_assesses = self.soup.select(
-            "#interest_sectl > div > div.rating_self.clearfix > div > div.rating_sum > span > a > span")
-        book_assess = book_assesses[0].contents[0] if book_assesses else 0
+        rating_list = get_media_rating_list(self.soup)
         book_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
 
+        # 价格
         book_price_list = [float(s) for s in re.findall(r'-?\d+\.?\d*', book_price)]
         if len(book_price_list):
             book_price = book_price_list[0]
         else:
             book_price = 0
+
+        # 简介
+        related_info = self.soup.select("div.intro")
+        related_infos = get_media_related_infos(related_info)
 
         book_dict[MediaInfo.TITLE.value] = title
         book_dict[MediaInfo.AUTHOR.value] = book_author
@@ -115,9 +116,10 @@ class ParserHtmlText:
         book_dict[MediaInfo.PAGES.value] = book_pages
         book_dict[MediaInfo.PRICE.value] = book_price
         book_dict[MediaInfo.ISBN.value] = book_isbn
-        book_dict[MediaInfo.RATING_F.value] = book_rating
-        book_dict[MediaInfo.ASSESS.value] = book_assess
+        book_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        book_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         book_dict[MediaInfo.IMG.value] = book_img
+        book_dict[MediaInfo.RELATED.value] = related_infos
         return book_dict
 
     def __get_music_dict(self):
@@ -147,9 +149,11 @@ class ParserHtmlText:
         music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
 
         # 评分 评价数 图片url
-        rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        music_rating = rating[0].contents[0] if rating else 0
-        # TODO 评论人数
+        # rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
+        # music_rating = rating[0].contents[0] if rating else 0
+        rating_list = get_media_rating_list(self.soup)
+
+
         # music_assesses = self.soup.select(
         #     "#rating_right > div.rating_sum > a")
         # # print(music_assesses)
@@ -163,8 +167,8 @@ class ParserHtmlText:
         music_dict[MediaInfo.MEDIUM.value] = music_medium
         music_dict[MediaInfo.RELEASE_DATE.value] = music_release_date
         music_dict[MediaInfo.ISRC.value] = music_isrc
-        music_dict[MediaInfo.RATING_F.value] = music_rating
-        # music_dict[MediaInfo.ASSESS.value] = music_assess
+        music_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        music_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         music_dict[MediaInfo.IMG.value] = music_img
         return music_dict
 
@@ -221,27 +225,18 @@ class ParserHtmlText:
         else:
             movie_categories = "未知"
 
-        imdb = infos[infos.index('IMDb:') + 1]
+        imdb = infos[infos.index('IMDb:') + 1] if 'IMDb' in infos else ""
 
-        # 评分 评价数 图片网址
-        # rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        # movie_rating = rating[0].contents[0] if rating else ""
-        rating_info = self.soup.select("#interest_sectl > div > div.rating_self.clearfix")
-        rating_infos = list(rating_info[0].strings)
-        rating_infos = [i.strip() for i in rating_infos if i.strip() != '']
-        if len(rating_infos) > 2:
-            movie_rating = rating_infos[0]
-            movie_assess = rating_infos[1]
-        else:
-            movie_rating = 0
-            movie_assess = 0
+        # 评分 评价数
+        rating_list = get_media_rating_list(self.soup)
 
-        # movie_assess = movie_assesses[0].contents[0] if movie_assesses else 0
+        # 图片网址
         movie_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
 
+        # 简介
         related_info = self.soup.select("#content > div > div.article > div > div.indent > span")
-        related_infos = list(related_info[0].strings)
-        related_infos = [i.strip() for i in related_infos if i.strip() != '']
+        related_infos = get_media_related_infos(related_info)
+
         # print(rating_infos)
 
         movie_dict[MediaInfo.TITLE.value] = movie_title
@@ -253,14 +248,11 @@ class ParserHtmlText:
         movie_dict[MediaInfo.LANGUAGE.value] = language_list
         movie_dict[MediaInfo.CATEGORIES.value] = movie_categories
         movie_dict[MediaInfo.IMDB.value] = imdb
-        movie_dict[MediaInfo.RATING_F.value] = float(movie_rating)
-        movie_dict[MediaInfo.ASSESS.value] = int(movie_assess)
+        movie_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        movie_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         movie_dict[MediaInfo.IMG.value] = movie_img
         movie_dict[MediaInfo.RELATED.value] = related_infos
-
         return movie_dict
-
-
 
     def get_music(self):
         infos = self.__get_music_dict()
@@ -270,7 +262,6 @@ class ParserHtmlText:
 def multiple_infos_parser(str_dict, str_key, next_number):
     str_list = []
     try:
-        str_list = []
         first_index = str_dict.index(str_key) + next_number
         str_list.append(str_dict[first_index])
         next_index = first_index
@@ -282,6 +273,35 @@ def multiple_infos_parser(str_dict, str_key, next_number):
                 break
         return str_list
     except Exception as err:
-        log_detail.error(f"【RUN】未解析到数据：{err}")
+        log_detail.error(f"【RUN】未解析到{str_key}数据：{err}")
         return  str_list
 
+def get_media_rating_list(soup):
+    rating_list = ['0', '0']
+    try:
+        rating_info = soup.select("#interest_sectl > div > div.rating_self.clearfix")
+        rating_infos = list(rating_info[0].strings)
+        rating_infos = [i.strip() for i in rating_infos if i.strip() != '']
+        if len(rating_infos) > 2:
+            rating_list = rating_infos
+            # rating_list[1] = rating_infos[1]
+        else:
+            rating_list[0] = 0.0
+            rating_list[1] = 0
+        return rating_list
+    except Exception as err:
+        log_detail.warn(f"【RUN】未解析到评价数据{err}")
+        return rating_list
+
+def get_media_related_infos(info):
+    try:
+        if info:
+            related_infos = list(info[0].strings)
+            related_infos = [i.strip() for i in related_infos if i.strip() != '']
+            related_infos = "\n".join(related_infos)
+            return related_infos
+        else:
+            return "暂无。"
+    except Exception as err:
+        log_detail.warn(f"【RUN】未解析到简介{err}")
+        return "暂无。。。"
