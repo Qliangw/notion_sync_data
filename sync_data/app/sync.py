@@ -36,6 +36,8 @@ def get_and_update(instance,
     :param database_id:
     :return:
     """
+    err_url = []
+    jump_number = 0
     while True:
         page_number = int(start_number / 15 + 1)
         # 获取html
@@ -63,39 +65,51 @@ def get_and_update(instance,
             notion_media_status = get_notion_media_status(token=token,
                                                           database_id=database_id,
                                                           media_url=url)
+            # 随机休眠0-1秒钟
+            time_number = random.random()
+            log_detail.debug(f"【RUN】访问notion时随机休眠时间0-1s，本次休眠：{time_number}s")
             if notion_media_status == "不存在":
                 html_text = instance.get_html_text(url=url,
                                                    user_id=user_id,
                                                    media_type=media_type,
                                                    media_status=media_status)
-                # 创一个详情页实例
-                html_parser = parser.ParserHtmlText(html_text=html_text)
-                # 解析详情页，获取数据字典
-                html_dict = html_parser.get_parser_dict(media_type=media_type)
+                if html_text:
+                    # 创一个详情页实例
+                    html_parser = parser.ParserHtmlText(html_text=html_text)
+                    # 解析详情页，获取数据字典
+                    html_dict = html_parser.get_parser_dict(media_type=media_type)
 
-                # 添加url
-                html_dict[MediaInfo.URL.value] = url
+                    # 添加url
+                    html_dict[MediaInfo.URL.value] = url
 
-                databases.update_database(data_dict=html_dict,
-                                          database_id=database_id,
-                                          token=token,
-                                          media_status=media_status,
-                                          media_type=media_type)
-                # 随机休眠5-10秒钟
-                time_number = random.randint(5, 10)
-                log_detail.info(f"【RUN】随机休眠时间5-10s，本次休眠：{time_number}s")
+                    databases.update_database(data_dict=html_dict,
+                                              database_id=database_id,
+                                              token=token,
+                                              media_status=media_status,
+                                              media_type=media_type)
+                    # 随机休眠5-10秒钟
+                    time_number = random.randint(8, 25)
+                    log_detail.debug(f"【RUN】访问豆瓣时随机休眠时间8-25s，本次休眠：{time_number}s")
+                else:
+                    log_detail.warn(f"【RUN】访问该页面出现问题，媒体链接：{url}")
+                    err_url.append(url)
+                    continue
 
             elif notion_media_status != now_status:
                 log_detail.warn("【RUN】豆瓣标记状态已经改变,notion状态同步功能暂不支持！")
             else:
                 log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
+                jump_number += 1
         log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
         print("*" * 15)
         if url_num > 14:
             start_number += 15
         else:
             break
-    log_detail.info(f"【RUN】所有信息已导入notion，共计导入{(page_number - 1) * 15 + len(url_list)}条数据。")
+    log_detail.info(f"【RUN】您的标记为<{media_status}>的<{media_type}>已导入notion")
+    log_detail.info(f"【RUN】共计{(page_number - 1) * 15 + len(url_list)}条数据。")
+    log_detail.info(f"【RUN】跳过{jump_number}条数据。")
+    return err_url
 
 
 def start_sync(media_type, media_status):
@@ -129,14 +143,19 @@ def start_sync(media_type, media_status):
 
     # 从第0个媒体开始获取
     start_number = 0
+    err_url_list = get_and_update(instance=douban_instance,
+                                  user_id=user_id,
+                                  media_type=media_type,
+                                  media_status=media_status,
+                                  start_number=start_number,
+                                  token=token,
+                                  database_id=database_id)
+    log_detail.info(f"【RUN】失败{len(err_url_list)}条数据！")
+    if err_url_list:
+        for i in range(0, len(err_url_list)):
+            log_detail.info(f"【RUN】第{i}条失败的媒体链接为：{err_url_list[i]}")
 
-    get_and_update(instance=douban_instance,
-                   user_id=user_id,
-                   media_type=media_type,
-                   media_status=media_status,
-                   start_number=start_number,
-                   token=token,
-                   database_id=database_id)
+
 
 
 def init_database():
