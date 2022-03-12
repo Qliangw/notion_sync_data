@@ -22,7 +22,7 @@
 
 ## [更新日志](https://github.com/Qliangw/notion_sync_data/blob/main/CHANGELOG.rst)
 
-## [使用方法](https://github.com/Qliangw/notion_sync_data/wiki/Wiki#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95)
+## [使用方法](https://ptest.notion.site/notion_sync_data-3d774621eda447c2a1428d2d3b118867)
 
 ## 页面展示
 
