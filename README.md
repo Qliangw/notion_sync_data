@@ -1,6 +1,11 @@
 # notion_sync_data
 将网络数据同步到notion笔记，方便快速查阅。
 
+[![GitHub stars](https://img.shields.io/github/stars/Qliangw/notion_sync_data?style=plastic)](https://github.com/Qliangw/notion_sync_data/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/Qliangw/notion_sync_data?style=plastic)](https://github.com/Qliangw/notion_sync_data/issues)
+
+![Visitors](https://api.visitorbadge.io/api/combined?path=https%3A%2F%2Fgithub.com%2FQliangw%2Fnotion_sync_data&label=visitors&labelColor=%235d5d5d&countColor=%23d9e3f0&style=plastic)
+
 - 目前已支持获取豆瓣【影、音、书】的信息的获取
 - 测试平台：Windows、Linux[Ubuntu20.4/Debain10]
 - 开发环境：Python 3.10.2（建议使用使用版本Python3.8+）
