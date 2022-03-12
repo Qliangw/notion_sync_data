@@ -13,6 +13,12 @@
 
 [Unreleased]
 ============
+`[v0.1.0-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.0-alpha...v0.1.0-beta>`_ - 2022-03-12
+========================
+- fix(douan): 修复一些解析问题
+- fix(douban): 修复访问豆瓣网页失败时无法正常执行的问题
+- feat(sync): 添加成功、失败、跳过的计数
+
 `[v0.1.0-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.7-beta...v0.1.0-alpha>`_ - 2022-03-11
 ========================
 
