@@ -81,12 +81,14 @@ class DouBanBase:
             res = self.req.get_res(url=url, headers=headers, cookies=cookies)
             log_detail.info("【RUN】请求url，获取返回值")
 
-            res_text = res.text
-            if res_text.find('有异常请求从你的 IP 发出') != -1:
-                log_detail.warn("【RUN】被豆瓣识别到抓取行为了，请更换 IP 后才能使用")
-                return None
-            # return etree.HTML(res_text)
-            return res_text
+            if res.status_code == 200:
+                res_text = res.text
+                if res_text.find('有异常请求从你的 IP 发出') != -1:
+                    log_detail.warn("【RUN】被豆瓣识别到抓取行为了，请更换 IP 后才能使用")
+                    return None
+                return res_text
+            elif res.status_code == 404:
+                log_detail.warn(f"【RUN】该页面不存在！{url}")
         except Exception as err:
             log_detail.error(f"【RUN】获取{url}页面失败:{format(err)}")
             return None
