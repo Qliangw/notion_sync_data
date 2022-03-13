@@ -12,6 +12,11 @@ __pychche__/
 *.py[cod]
 *&py.class
 
+# 编译文件
+build/
+dist/
+*.exe
+*.spec
 
 # 一些文档
 /doc/config.yaml
