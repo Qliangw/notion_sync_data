@@ -39,6 +39,7 @@ class MediaInfo(Enum):
     TAG_LIST = "tag_list"               # 标签
     RATING_F = "rating"                 # 评分
     ASSESS = 'assess'                   # 评价数
+    RELATED = "related_infos"
 
     # 书籍
     AUTHOR = "author"                   # 作者
@@ -57,6 +58,17 @@ class MediaInfo(Enum):
     RELEASE_DATE = "release_date"       # 发行时间
     MUSIC_PUB = "music_pub"             # 出版者
     ISRC = "isrc"                       # 条形码
+
+    # 电影
+    DIRECTOR = "director"
+    SCREENWRITER = "screenwriter"
+    STARRING = "starring"
+    MOVIE_TYPE = "movie_type"
+    C_OR_R = "country_or_region"
+    LANGUAGE = "language"
+    CATEGORIES = "Categories"
+    IMDB = "IMDb"
+
 
 class MediaXpathParam(Enum):
     """

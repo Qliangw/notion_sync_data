@@ -10,6 +10,7 @@ class ConfigName(Enum):
     USER_AGENT = "user_agent"
     DOUBAN = "douban"
     DOUBAN_USER_ID = 'user_id'
+    DOUBAN_DAY = "day"
 
     NOTION = "notion"
     NOTION_TOKEN = 'token'
@@ -26,3 +27,13 @@ class UserConfig(object):
         self.user_agent = ''
         self.douban = {}
         self.notion = {}
+
+def get_desensitization_of_user_info(user_info):
+    x_user_info = ''
+    user_len = len(user_info)
+    for i in range(user_len):
+        if user_len / 2 - user_len / 4 < i < user_len / 2 + user_len / 4:
+            x_user_info += "*"
+        else:
+            x_user_info += user_info[i]
+    return x_user_info

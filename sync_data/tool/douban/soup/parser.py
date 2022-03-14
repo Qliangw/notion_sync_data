@@ -2,6 +2,7 @@
 # @Author  : Qliangw
 # @Time    : 2022/3/1 21:05
 # @Function: 使用bs4查找html相关数据
+import datetime
 import re
 
 from bs4 import BeautifulSoup
@@ -18,6 +19,73 @@ class ParserHtmlText:
     def __init__(self, html_text):
         self.html = html_text
         self.soup = BeautifulSoup(self.html, 'html.parser')
+
+    def get_url_dict(self, monitoring_day=0):
+        """
+        解析个人wish/do/collect内容的每个url
+
+        :return: { url_list: [url数组], monitoring_info: [符合日期的个数,是否继续]}
+        """
+        record_key = 0
+        url_list = []
+        continue_request = True
+        monitoring_info = [0, continue_request]
+        url_dict = {}
+        try:
+            info = self.soup.select('.nbg')
+            for url in info:
+                url_list.append(url.get('href'))
+
+            if monitoring_day != 0:
+                mark_date = self.soup.select('span.date')
+                # 处理所有标记时间
+                num = 0
+                mark_date_dict = {}
+                while num < len(mark_date):
+                    mark_date_dict[num] = list(mark_date[num].strings)
+                    # mark_date_dict[num] = ''.join([i.rstrip()[:-9] for i in mark_date_dict[num] if i.strip() != ''])
+                    mark_date_dict[num] = ''.join([i.split("\n", 1)[0] for i in mark_date_dict[num] if i.strip() != ''])
+                    num += 1
+
+                # 获取当天时间
+                today = datetime.datetime.now()
+                today = datetime.datetime.now()
+                log_detail.warn(f"【RUN】当前时间为：{today}")
+
+                # 判断 标记时间
+                # 符合监控日期内媒体个数计数
+                count_num = 0
+                for key in mark_date_dict:
+                    mark_date_i = datetime.datetime.strptime(mark_date_dict.get(key), '%Y-%m-%d')
+                    interval = today - mark_date_i
+                    if interval.days <  monitoring_day:
+                        log_detail.debug(f'第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
+                        count_num += 1
+                    else:
+                        log_detail.debug(f"第{count_num}个的{key}数据{mark_date_i}超出时间范围，不处理")
+                        record_key = int(key)
+                        break
+                log_detail.debug(f"【RUN】监控日期内，对应的位置{record_key}")
+            else:
+                # 如果没有监控日期，与媒体个数相同即可
+                record_key = len(url_list)
+                count_num = len(url_list)
+
+            # 如果该页媒体为15，且监控没有限制或者都在监控日期内，则继续获取下一页内容
+            if len(url_list) == 15 and count_num == len(url_list):
+                continue_request = True
+            else:
+                continue_request = False
+
+            monitoring_info[0] = record_key
+            monitoring_info[1] = continue_request
+            url_dict["url_list"] = url_list
+            url_dict["monitoring_info"] = monitoring_info
+            return url_dict
+
+        except Exception as err:
+            log_detail.warn(f"【RUN】解析失败：{err}")
+            return url_dict
 
     def get_url_list(self):
         """
@@ -55,10 +123,11 @@ class ParserHtmlText:
         # self.soup = BeautifulSoup(self.html, 'html.parser')
         if media_type == MediaType.BOOK.value:
             self.dict = self.__get_book_dict()
-        elif media_type == MediaType.MOVIE.value:
-            log_detail.warn("【RUN】暂不支持电影、电视剧的导入！")
         elif media_type == MediaType.MUSIC.value:
             self.dict = self.__get_music_dict()
+        elif media_type == MediaType.MOVIE.value:
+            # log_detail.warn("【RUN】暂不支持电影、电视剧的导入！")
+            self.dict = self.__get_movie_dict()
         else:
             pass
 
@@ -93,18 +162,19 @@ class ParserHtmlText:
         book_isbn = infos[infos.index('ISBN:') + 1] if 'ISBN:' in infos else ""
 
         # 评分 评价数 图片网址
-        rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        book_rating = rating[0].contents[0] if rating else ""
-        book_assesses = self.soup.select(
-            "#interest_sectl > div > div.rating_self.clearfix > div > div.rating_sum > span > a > span")
-        book_assess = book_assesses[0].contents[0] if book_assesses else 0
+        rating_list = get_media_rating_list(self.soup)
         book_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
 
+        # 价格
         book_price_list = [float(s) for s in re.findall(r'-?\d+\.?\d*', book_price)]
         if len(book_price_list):
             book_price = book_price_list[0]
         else:
             book_price = 0
+
+        # 简介
+        related_info = self.soup.select("div.intro")
+        related_infos = get_media_related_infos(related_info)
 
         book_dict[MediaInfo.TITLE.value] = title
         book_dict[MediaInfo.AUTHOR.value] = book_author
@@ -114,21 +184,11 @@ class ParserHtmlText:
         book_dict[MediaInfo.PAGES.value] = book_pages
         book_dict[MediaInfo.PRICE.value] = book_price
         book_dict[MediaInfo.ISBN.value] = book_isbn
-        book_dict[MediaInfo.RATING_F.value] = book_rating
-        book_dict[MediaInfo.ASSESS.value] = book_assess
+        book_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        book_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         book_dict[MediaInfo.IMG.value] = book_img
+        book_dict[MediaInfo.RELATED.value] = related_infos
         return book_dict
-
-    def __movie(self):
-        # TODO 影视解析
-        log_detail.debug("【RUN】解析影视信息")
-        # 标签名不加任何修饰，类名前加点，id名前加#
-        info = self.soup.select('#info')
-        infos = list(info[0].strings)
-        infos = [i.strip() for i in infos if i.strip() != '']
-        movie_dict = {}
-        # 影视名称
-        title = self.soup.select('#wrapper > h1 > span')[0].contents[0]
 
     def __get_music_dict(self):
         log_detail.debug("【RUN】解析音乐信息")
@@ -157,9 +217,11 @@ class ParserHtmlText:
         music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
 
         # 评分 评价数 图片url
-        rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        music_rating = rating[0].contents[0] if rating else 0
-        # TODO 评论人数
+        # rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
+        # music_rating = rating[0].contents[0] if rating else 0
+        rating_list = get_media_rating_list(self.soup)
+
+
         # music_assesses = self.soup.select(
         #     "#rating_right > div.rating_sum > a")
         # # print(music_assesses)
@@ -173,15 +235,141 @@ class ParserHtmlText:
         music_dict[MediaInfo.MEDIUM.value] = music_medium
         music_dict[MediaInfo.RELEASE_DATE.value] = music_release_date
         music_dict[MediaInfo.ISRC.value] = music_isrc
-        music_dict[MediaInfo.RATING_F.value] = music_rating
-        # music_dict[MediaInfo.ASSESS.value] = music_assess
+        music_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        music_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         music_dict[MediaInfo.IMG.value] = music_img
         return music_dict
+
+
+    def __get_movie_dict(self):
+        log_detail.debug("【RUN】解析影视信息")
+        # 标签名不加任何修饰，类名前加点，id名前加#
+        info = self.soup.select('#info')
+        infos = list(info[0].strings)
+        infos = [i.strip() for i in infos if i.strip() != '']
+        movie_dict = {}
+        # 影视名称
+        title = self.soup.select('#wrapper > div > h1')
+        titles = list(title[0].strings)
+        titles = [i.strip() for i in titles if i.strip() != '']
+        movie_title = ''.join(titles)
+
+        # 导演
+        if '导演' in infos:
+            movie_director = multiple_infos_parser(infos, '导演', 2)
+        else:
+            movie_director = ""
+
+        # 编剧 主演 类型
+        screenwriter = multiple_infos_parser(infos, "编剧", 2)
+        starring = multiple_infos_parser(infos, "主演", 2)
+        movie_type = multiple_infos_parser(infos, "类型:" , 1)
+
+        # 国家或地区
+        country_or_region = infos[infos.index("制片国家/地区:") + 1]
+        country_or_region_list = country_or_region.split('/')
+        c_or_r = []
+        for i in country_or_region_list:
+            c_or_r.append(i.strip(' '))
+
+        # 语言
+        language = infos[infos.index("语言:") + 1]
+        language_list_tmp = language.split('/')
+        language_list = []
+        for i in language_list_tmp:
+            language_list.append(i.strip(' '))
+
+        # 分类 电影和电视剧 以及 动画片（电影）和动漫（剧集）
+        if '上映时间:' in infos or '上映日期:' in infos:
+            if '动画' in movie_type:
+                movie_categories = "动画片"
+            else:
+                movie_categories = '电影'
+        elif "首播:" in infos or "首播时间:" in infos:
+            if '动画' in movie_type:
+                movie_categories = "动漫"
+            else:
+                movie_categories = "电视剧"
+        else:
+            movie_categories = "未知"
+
+        imdb = infos[infos.index('IMDb:') + 1] if 'IMDb' in infos else ""
+
+        # 评分 评价数
+        rating_list = get_media_rating_list(self.soup)
+
+        # 图片网址
+        movie_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
+
+        # 简介
+        related_info = self.soup.select("#content > div > div.article > div > div.indent > span")
+        related_infos = get_media_related_infos(related_info)
+
+        # print(rating_infos)
+
+        movie_dict[MediaInfo.TITLE.value] = movie_title
+        movie_dict[MediaInfo.DIRECTOR.value] = movie_director
+        movie_dict[MediaInfo.SCREENWRITER.value] = screenwriter
+        movie_dict[MediaInfo.STARRING.value] = starring
+        movie_dict[MediaInfo.MOVIE_TYPE.value] = movie_type
+        movie_dict[MediaInfo.C_OR_R.value] = c_or_r
+        movie_dict[MediaInfo.LANGUAGE.value] = language_list
+        movie_dict[MediaInfo.CATEGORIES.value] = movie_categories
+        movie_dict[MediaInfo.IMDB.value] = imdb
+        movie_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        movie_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
+        movie_dict[MediaInfo.IMG.value] = movie_img
+        movie_dict[MediaInfo.RELATED.value] = related_infos
+        return movie_dict
 
     def get_music(self):
         infos = self.__get_music_dict()
         # log_detail.info(f"{infos}")
         return infos
 
+def multiple_infos_parser(str_dict, str_key, next_number):
+    str_list = []
+    try:
+        first_index = str_dict.index(str_key) + next_number
+        str_list.append(str_dict[first_index])
+        next_index = first_index
+        while True:
+            if str_dict[next_index + 1] == '/':
+                next_index += 2
+                str_list.append(str_dict[next_index])
+            else:
+                break
+        return str_list
+    except Exception as err:
+        log_detail.error(f"【RUN】未解析到{str_key}数据：{err}")
+        return  str_list
 
+def get_media_rating_list(soup):
+    rating_list = ['0', '0']
+    try:
+        rating_info = soup.select("#interest_sectl > div > div.rating_self.clearfix")
+        rating_infos = list(rating_info[0].strings)
+        rating_infos = [i.strip() for i in rating_infos if i.strip() != '']
+        if len(rating_infos) > 2:
+            rating_list = rating_infos
+            # rating_list[1] = rating_infos[1]
+        else:
+            rating_list[0] = 0.0
+            rating_list[1] = 0
+        return rating_list
+    except Exception as err:
+        log_detail.warn(f"【RUN】未解析到评价数据{err}")
+        return rating_list
 
+def get_media_related_infos(info):
+    try:
+        if info:
+            related_infos = list(info[0].strings)
+            related_infos = [i.strip() for i in related_infos if i.strip() != '']
+            related_infos = "\n".join(related_infos)
+            return related_infos
+        else:
+            return "暂无。"
+    except Exception as err:
+        log_detail.warn(f"【RUN】未解析到简介{err}")
+        return "暂无。。。"
