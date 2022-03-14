@@ -142,7 +142,7 @@ def get_auto_config():
             yaml.dump(auto_config, file, allow_unicode=True)
         return auto_config
     else:
-        log_detail.info("【RUN】读取配置文件")
+        log_detail.info("【RUN】读取程序自动配置的文件[auto.yaml]")
         with open(auto_conf_path, 'r', encoding='utf-8') as file:
             auto_conf = yaml.safe_load(file)
         return auto_conf
