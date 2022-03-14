@@ -13,6 +13,12 @@
 
 [Unreleased]
 ============
+`[v0.1.1-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1-alpha...v0.1.1-beta>`_ - 2022-03-14
+========================
+
+- fix(douban): 修复 `[issues#7] <https://github.com/Qliangw/notion_sync_data/issues/7>`_ 豆瓣电影信息不全（导演、编剧、主演、类型、国家或地区、语言）时异常的问题
+
+
 `[v0.1.1-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.0-beta...v0.1.1-alpha>`_ - 2022-03-14
 ========================
 
@@ -44,7 +50,7 @@
 `[v0.0.7-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.0.6-beta...v0.0.7-alpha>`_ - 2022-03-10
 ========================
 
-- fix(run.py): `issues-4 <https://github.com/Qliangw/notion_sync_data/issues/4>`_ ，使用-s all参数报错的问题
+- fix(run.py): `issues#4 <https://github.com/Qliangw/notion_sync_data/issues/4>`_ ，使用-s all参数报错的问题
 - feat: 通过-v 或者--version可查询版本号
 - docs: update
 
