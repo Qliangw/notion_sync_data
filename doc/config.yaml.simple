@@ -23,8 +23,8 @@ douban:
   user_id: ''
   # 【预留】可以为空
   cookies: ''
-  # 【预留】多少天内的
-  day: 180
+  # 【必填】 1. 填写为0时，监控所有的  | 2. 填写非零的正整数，则监控x天内的。比如填写30，则监控一个月内的；365，则监控一年内的。
+  day: 30
 
   # 【已弃用】all | part，选择all后自动忽略 day status media_type
   select: 'all'
