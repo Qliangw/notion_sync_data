@@ -47,6 +47,7 @@ if __name__ == '__main__':
         else:
             if status == 'all':
                 for i in ['do', 'wish', 'collect']:
+                    log_detail.info("----开始拉取数据----")
                     log_detail.info(f"【RUN】开始获取{media}的{i}状态信息")
                     start_sync(media_type=media, media_status=i)
             else:
@@ -56,13 +57,13 @@ if __name__ == '__main__':
         log_detail.warn(f'【Tip】您输入的-m参数为< {media} >,请输入< python run.py -h >查看正确指令')
         log_detail.warn(f'【Tip】您输入的-s参数为< {status} >,请输入< python run.py -h >查看正确指令')
     elif func == 'init':
-        print("初始化数据库")
+        log_detail.info("----初始化数据库----")
         init_database()
-        log_detail.info("【Tip】请在浏览器查看您的notion页面，并将新创建的数据库id填入到config.yaml。")
+        log_detail.info("【Tip】已在notion页面创建数据库，请输入<python run.py -m [book/music/movie] -s [wish/do/collect/all]>完成媒体的导入")
     elif func is not None:
-        log_detail.info(f'【Tip】您输入的-f参数为< {func} >，请输入< python run.py -h >查看正确指令')
+        log_detail.warn(f'【Tip】您输入的-f参数为< {func} >，请输入< python run.py -h >查看正确指令')
     else:
-        log_detail.info(f'【Tip】请输入< python run.py -h >查看正确指令')
+        log_detail.warn(f'【Tip】请输入< python run.py -h >查看正确指令')
 
     log_detail.info("【RUN】程序结束！")
 
