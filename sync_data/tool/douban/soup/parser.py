@@ -265,19 +265,9 @@ class ParserHtmlText:
         starring = multiple_infos_parser(infos, "主演", 2)
         movie_type = multiple_infos_parser(infos, "类型:" , 1)
 
-        # 国家或地区
-        country_or_region = infos[infos.index("制片国家/地区:") + 1]
-        country_or_region_list = country_or_region.split('/')
-        c_or_r = []
-        for i in country_or_region_list:
-            c_or_r.append(i.strip(' '))
-
-        # 语言
-        language = infos[infos.index("语言:") + 1]
-        language_list_tmp = language.split('/')
-        language_list = []
-        for i in language_list_tmp:
-            language_list.append(i.strip(' '))
+        # 国家或地区 语言
+        c_or_r = get_simple_info_list(infos, "制片国家/地区:")
+        language_list = get_simple_info_list(infos, "语言:")
 
         # 分类 电影和电视剧 以及 动画片（电影）和动漫（剧集）
         if '上映时间:' in infos or '上映日期:' in infos:
@@ -327,18 +317,38 @@ class ParserHtmlText:
         # log_detail.info(f"{infos}")
         return infos
 
+def get_simple_info_list(str_dict, str_key):
+    str_list = []
+    try:
+        if str_key in str_dict:
+            data_list_tmp = str_dict[str_dict.index(str_key) + 1]
+            data_list_tmp = data_list_tmp.split('/')
+
+            for i in data_list_tmp:
+                str_list.append(i.strip(' '))
+        else:
+            log_detail.warn(f"【RUN】未解析到<{str_key}>信息")
+        return str_list
+    except Exception as err:
+        log_detail.error(f"【RUN】未解析到<{str_key}>信息:{err}")
+        return str_list
+
 def multiple_infos_parser(str_dict, str_key, next_number):
     str_list = []
     try:
-        first_index = str_dict.index(str_key) + next_number
-        str_list.append(str_dict[first_index])
-        next_index = first_index
-        while True:
-            if str_dict[next_index + 1] == '/':
-                next_index += 2
-                str_list.append(str_dict[next_index])
-            else:
-                break
+        if str_key in str_dict:
+
+            first_index = str_dict.index(str_key) + next_number
+            str_list.append(str_dict[first_index])
+            next_index = first_index
+            while True:
+                if str_dict[next_index + 1] == '/':
+                    next_index += 2
+                    str_list.append(str_dict[next_index])
+                else:
+                    break
+        else:
+            log_detail.warn(f"【RUN】未解析到{str_key}数据，返回空值")
         return str_list
     except Exception as err:
         log_detail.error(f"【RUN】未解析到{str_key}数据：{err}")
