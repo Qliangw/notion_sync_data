@@ -13,6 +13,16 @@
 
 [Unreleased]
 ============
+`[v0.1.1-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.0-beta...v0.1.1-alpha>`_ - 2022-03-14
+========================
+
+- style: 调整日志输出内容
+- feat: 增加监控日期的功能
+- feat: 用户信息脱敏处理
+
+.. tip::
+    有关监控日期的使用请看： `[config.yaml] <https://github.com/Qliangw/notion_sync_data/blob/main/doc/config.yaml.simple>`_ 中 ``douban -> day`` 参数的说明
+
 `[v0.1.0-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.0-alpha...v0.1.0-beta>`_ - 2022-03-12
 ========================
 - fix(douan): 修复一些解析问题
