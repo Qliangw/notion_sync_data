@@ -152,11 +152,11 @@ class ParserHtmlText:
         book_author = ''.join(map(str.strip, book_author.split('\n')))
 
         # 出版社 副标题 出版年 页数 定价 ISBN
-        book_publisher = infos[infos.index('出版社:') + 1] if '出版社:' in infos else ""
+        book_publisher = infos[infos.index('出版社:') + 1] if '出版社:' in infos else "xxxx"
         book_publisher = book_publisher.replace(',', '')
         book_subhead = infos[infos.index('副标题:') + 1] if '副标题:' in infos else ""
-        book_pub_date = infos[infos.index('出版年:') + 1] if '出版年:' in infos else ""
-        book_pages = infos[infos.index('页数:') + 1] if '页数:' in infos else ""
+        book_pub_date = infos[infos.index('出版年:') + 1] if '出版年:' in infos else "xxxx"
+        book_pages = infos[infos.index('页数:') + 1] if '页数:' in infos else 0
         book_price = infos[infos.index('定价:') + 1] if '定价:' in infos else ""
         # https://isbnsearch.org/isbn/{ISBN}
         book_isbn = infos[infos.index('ISBN:') + 1] if 'ISBN:' in infos else ""
