@@ -9,7 +9,8 @@ app:
   log_type: 'CONSOLE'
 
   # 日志文件的路径，log_type为FILE时生效
-  log_path: 'D:\Development\SourceCode\notion_sync_douban\logs'
+  # 如 windows路径： 'D:\Development\SourceCode\notion_sync_douban\logs'
+  log_path: ''
 
   # 群晖日志中心IP和端口，log_type为SERVER时生效。端口一般是514，只需要改动IP为群晖的IP。
   log_server: 127.0.0.1:514
@@ -21,18 +22,12 @@ user_agent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 douban:
   # 【必填】
   user_id: ''
-  # 【预留】可以为空
-  cookies: ''
+
   # 【必填】 1. 填写为0时，监控所有的  | 2. 填写非零的正整数，则监控x天内的。比如填写30，则监控一个月内的；365，则监控一年内的。
   day: 30
 
-  # 【已弃用】all | part，选择all后自动忽略 day status media_type
-  select: 'all'
-  # 【已弃用】1 - 想看（wish) | 2 - 再看（do）| 3 - 看过（collect）
-  status: 1
-  # 【已弃用】1-书 | 2-电影 | 3-电视剧 | 4-音乐
-  media_type: 1
-
+  # 【预留】暂时不用填写
+  cookies: ''
 
 # notion获取
 notion:
@@ -42,9 +37,3 @@ notion:
 
   # 在浏览器打开你要导入的notion页面，复制后面的一串数字
   page_id: ''
-
-  # 【已弃用】
-  book_database_id: ''
-  music_database_id: ''
-  tv_database_id: ''
-  movie_database_id: ''
