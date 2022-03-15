@@ -48,7 +48,7 @@ def get_body(data_dict, database_id, media_status, media_type):
         status = ""
         music_status = ""
 
-    log_detail.info(f"【RUN】{media_type}数据信息整理为json格式")
+    log_detail.info(f"【RUN】- {media_type}数据信息整理为json格式")
     rating = data_dict[MediaInfo.RATING_F.value]
     # rating = float(rat) if rat == "" else 0
     if media_type == MediaType.MUSIC.value:
@@ -393,7 +393,7 @@ def create_database(token, page_id, media_type):
         exit(f"网络请求错误:{err}")
 
 
-def update_database(data_dict, database_id, token, media_status, media_type):
+def get_flag_update_database(data_dict, database_id, token, media_status, media_type):
     """
     写入数据库
 
@@ -416,11 +416,13 @@ def update_database(data_dict, database_id, token, media_status, media_type):
                        headers=page_data.get_headers(),
                        params=body)
         if res.status_code == 200:
-            log_detail.info(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{data_dict["url"]}')
-            return None
+            # log_detail.info(f'【RUN】- 导入《{data_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{data_dict["url"]}')
+            return "succeed"
         else:
-            log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}！媒体链接：{data_dict["url"]}')
+            log_detail.warn(f'【RUN】导入失败：{res.content}！')
+            return "failed"
     except Exception as err:
-        log_detail.error(f'【RUN】导入数据库错误：{err}！媒体链接：{data_dict["url"]}')
+        log_detail.error(f'【RUN】导入异常：{err}！')
+        return "exception"
 
 

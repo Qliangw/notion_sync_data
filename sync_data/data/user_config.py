@@ -17,7 +17,6 @@ class ConfigName(Enum):
     NOTION_PAGE_ID = 'page_id'
     NOTION_BOOK = 'book_database_id'
     NOTION_MUSIC = 'music_database_id'
-    NOTION_TV = 'tv_database_id'
     NOTION_MOVIE = 'movie_database_id'
 
 

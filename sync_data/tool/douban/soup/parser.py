@@ -24,7 +24,7 @@ class ParserHtmlText:
         """
         解析个人wish/do/collect内容的每个url
 
-        :return: { url_list: [url数组], monitoring_info: [符合日期的个数,是否继续]}
+        :return: url_list: [url数组], monitoring_info: [符合日期的个数,是否继续]
         """
         record_key = 0
         url_list = []
@@ -50,7 +50,7 @@ class ParserHtmlText:
                 # 获取当天时间
                 today = datetime.datetime.now()
                 today = datetime.datetime.now()
-                log_detail.warn(f"【RUN】当前时间为：{today}")
+                log_detail.debug(f"【RUN】- 当前时间为：{today}")
 
                 # 判断 标记时间
                 # 符合监控日期内媒体个数计数
@@ -59,13 +59,13 @@ class ParserHtmlText:
                     mark_date_i = datetime.datetime.strptime(mark_date_dict.get(key), '%Y-%m-%d')
                     interval = today - mark_date_i
                     if interval.days <  monitoring_day:
-                        log_detail.debug(f'第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
+                        log_detail.debug(f'【RUN】-- 第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
                         count_num += 1
                     else:
-                        log_detail.debug(f"第{count_num}个的{key}数据{mark_date_i}超出时间范围，不处理")
+                        log_detail.debug(f"【RUN】-- 第{count_num}个的{key}数据{mark_date_i}超出时间范围，不处理")
                         record_key = int(key)
                         break
-                log_detail.debug(f"【RUN】监控日期内，对应的位置{record_key}")
+                log_detail.debug(f"【RUN】-- 监控日期内，对应的位置{record_key}")
             else:
                 # 如果没有监控日期，与媒体个数相同即可
                 record_key = len(url_list)
@@ -74,6 +74,7 @@ class ParserHtmlText:
             # 如果该页媒体为15，且监控没有限制或者都在监控日期内，则继续获取下一页内容
             if len(url_list) == 15 and count_num == len(url_list):
                 continue_request = True
+                record_key = len(url_list)
             else:
                 continue_request = False
 
@@ -84,7 +85,7 @@ class ParserHtmlText:
             return url_dict
 
         except Exception as err:
-            log_detail.warn(f"【RUN】解析失败：{err}")
+            log_detail.warn(f"【RUN】- 解析失败：{err}")
             return url_dict
 
     def get_url_list(self):
@@ -115,7 +116,7 @@ class ParserHtmlText:
             return self.dict
         except Exception as err:
             log_detail.warn(f"【RUN】解析失败：{err}")
-            return []
+            return {}
 
     def __parser(self, media_type):
         # parser_dict = {}
@@ -132,7 +133,7 @@ class ParserHtmlText:
             pass
 
     def __get_book_dict(self):
-        log_detail.debug("【RUN】解析书籍信息")
+        log_detail.debug("【RUN】- 解析书籍信息")
         # 标签名不加任何修饰，类名前加点，id名前加#
         info = self.soup.select('#info')
         infos = list(info[0].strings)
@@ -191,7 +192,7 @@ class ParserHtmlText:
         return book_dict
 
     def __get_music_dict(self):
-        log_detail.debug("【RUN】解析音乐信息")
+        log_detail.debug("【RUN】- 解析音乐信息")
         info = self.soup.select('#info')
         infos = list(info[0].strings)
         infos = [i.strip() for i in infos if i.strip() != '']
@@ -217,15 +218,7 @@ class ParserHtmlText:
         music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
 
         # 评分 评价数 图片url
-        # rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        # music_rating = rating[0].contents[0] if rating else 0
         rating_list = get_media_rating_list(self.soup)
-
-
-        # music_assesses = self.soup.select(
-        #     "#rating_right > div.rating_sum > a")
-        # # print(music_assesses)
-        # music_assess = music_assesses[0].contents[0] if music_assesses else ""
         music_img = self.soup.select("#mainpic > span > a > img")[0].attrs['src']
 
         music_dict[MediaInfo.TITLE.value] = title
@@ -242,7 +235,7 @@ class ParserHtmlText:
 
 
     def __get_movie_dict(self):
-        log_detail.debug("【RUN】解析影视信息")
+        log_detail.debug("【RUN】- 解析影视信息")
         # 标签名不加任何修饰，类名前加点，id名前加#
         info = self.soup.select('#info')
         infos = list(info[0].strings)
@@ -295,7 +288,6 @@ class ParserHtmlText:
         related_info = self.soup.select("#content > div > div.article > div > div.indent > span")
         related_infos = get_media_related_infos(related_info)
 
-        # print(rating_infos)
 
         movie_dict[MediaInfo.TITLE.value] = movie_title
         movie_dict[MediaInfo.DIRECTOR.value] = movie_director
@@ -312,12 +304,18 @@ class ParserHtmlText:
         movie_dict[MediaInfo.RELATED.value] = related_infos
         return movie_dict
 
-    def get_music(self):
-        infos = self.__get_music_dict()
-        # log_detail.info(f"{infos}")
-        return infos
+    # def get_music(self):
+    #     infos = self.__get_music_dict()
+    #     return infos
 
 def get_simple_info_list(str_dict, str_key):
+    """
+    获取豆瓣信息， 针对豆瓣:和关键字在一起的
+
+    :param str_dict: 字符串字典
+    :param str_key: 字符串字典关键字
+    :return: 对应key值信息的列表
+    """
     str_list = []
     try:
         if str_key in str_dict:
@@ -327,13 +325,21 @@ def get_simple_info_list(str_dict, str_key):
             for i in data_list_tmp:
                 str_list.append(i.strip(' '))
         else:
-            log_detail.warn(f"【RUN】未解析到<{str_key}>信息")
+            log_detail.warn(f"【RUN】- 未解析到<{str_key}>信息")
         return str_list
     except Exception as err:
-        log_detail.error(f"【RUN】未解析到<{str_key}>信息:{err}")
+        log_detail.error(f"【RUN】- 未解析到<{str_key}>信息:{err}")
         return str_list
 
 def multiple_infos_parser(str_dict, str_key, next_number):
+    """
+    解析媒体info, 必须豆瓣中是':'和名称不一起的数据
+
+    :param str_dict: 字符串字典
+    :param str_key: 字符串字典关键字
+    :param next_number: 豆瓣中/的位置
+    :return: 对应key值信息的列表
+    """
     str_list = []
     try:
         if str_key in str_dict:
@@ -355,6 +361,12 @@ def multiple_infos_parser(str_dict, str_key, next_number):
         return  str_list
 
 def get_media_rating_list(soup):
+    """
+    获取媒体评分
+
+    :param soup:
+    :return: 返回一个评分list, 0-float型评分，1-int型评分人数
+    """
     rating_list = ['0', '0']
     try:
         rating_info = soup.select("#interest_sectl > div > div.rating_self.clearfix")
@@ -372,6 +384,12 @@ def get_media_rating_list(soup):
         return rating_list
 
 def get_media_related_infos(info):
+    """
+    获取媒体简介
+
+    :param info:
+    :return: 媒体简介 str类型
+    """
     try:
         if info:
             related_infos = list(info[0].strings)
