@@ -198,34 +198,14 @@ def init_database():
     :return:
     """
     config_dict = Config().get_config()
+    log_detail.info("【RUN】读取用户配置的文件[config.yaml]")
     token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
+    x_token = get_desensitization_of_user_info(token)
+    log_detail.info(f"【RUN】- 取得 notion 的 token：{x_token}")
     page_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_PAGE_ID.value]
-    # media_type_list = [MediaType.BOOK.value, MediaType.MUSIC.value, MediaType.MOVIE.value]
+    page_id = get_desensitization_of_user_info(page_id)
+    log_detail.info(f"【RUN】- 取得 notion 的 page_id：{page_id}")
 
-    #########################################################
-    # 下个版本删除
-    # book_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
-    # tv_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TV.value]
-    # media_type = [MediaType.BOOK.value, MediaType.MUSIC.value, MediaType.MOVIE.value]
-    try:
-        auto_conf = get_auto_config()
-        log_detail.warn("【Tip】将个人数据库配置复制到[auto.yaml]中，将来版本会移除移动配置的功能！")
-        if auto_conf[ConfigName.NOTION_BOOK.value] == "" or len(auto_conf[ConfigName.NOTION_BOOK.value]) != 32:
-            book_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
-            auto_conf[ConfigName.NOTION_BOOK.value] = book_db_id if len(book_db_id) == 32 else ""
-
-        if auto_conf[ConfigName.NOTION_MUSIC.value] == "" or len(auto_conf[ConfigName.NOTION_MUSIC.value]) != 32:
-            music_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
-            auto_conf[ConfigName.NOTION_MUSIC.value] = music_db_id if len(music_db_id) == 32 else ""
-
-        if auto_conf[ConfigName.NOTION_MOVIE.value] == "" or len(auto_conf[ConfigName.NOTION_MOVIE.value]) != 32:
-            movie_db_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MOVIE.value]
-            auto_conf[ConfigName.NOTION_MOVIE.value] = movie_db_id if len(movie_db_id) == 32 else ""
-
-        save_auto_config(auto_conf)
-    except Exception as err:
-        log_detail.error(f"【RUN】config配置参数问题：{err}")
-    #########################################################
     auto_config = get_auto_config()
     log_detail.debug(auto_config)
     log_detail.info("【RUN】开始notion对应豆瓣书影音的初始化...")
