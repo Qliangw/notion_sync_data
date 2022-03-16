@@ -13,6 +13,9 @@
 > 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
 
 
+
+**最新版本：**[v0.1.1](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.1)
+
 ## 功能
 
 - [x] 豆瓣【影、音、书】的信息
@@ -22,8 +25,9 @@
 
 **TODO**
 
-- [ ] 添加GUI或者Web
-- [ ] 适配Win和Mac的可执行程序
+- [ ] 添加GUI（学习中
+- [ ] notion根据豆瓣信息变化进行更新（标记状态、评分、评分人数）
+- [ ] 主要针对书籍标记信息添加一列【阅读时间】
 - [ ] [营养成分表](https://www.tianapi.com/apiview/121)
 
 ## [更新日志](https://github.com/Qliangw/notion_sync_data/blob/main/CHANGELOG.rst)

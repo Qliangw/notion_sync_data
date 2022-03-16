@@ -13,6 +13,22 @@
 
 [Unreleased]
 ============
+`[v0.1.1] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1-beta...v0.1.1>`_ - 2022-03-16
+========================
+- fix: 修复书籍信息（出版社、评分、评分人数、页数等）不全无法正常导入的问题
+
+- fix(sync): 修复notion已存在时输入日志的问题
+- fix(parser): 修复访问多页时临界值问题
+- feat: notion数据库参数分离
+- style: 冗余代码函数化
+- refactor: 调整日志输出格式
+
+.. tip::
+
+    - 大概没有太多严重问题了
+
+    - TODO: 有时间学学界面化搞GUI，不想再用命令导入了！
+
 `[v0.1.1-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1-alpha...v0.1.1-beta>`_ - 2022-03-14
 ========================
 
