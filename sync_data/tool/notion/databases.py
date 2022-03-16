@@ -9,6 +9,7 @@ import re
 import requests
 
 from sync_data.tool.douban.data.enum_data import MediaInfo, MediaStatus, MediaType
+from sync_data.tool.notion.data.enum_data import DatabaseProperty
 from sync_data.utils import log_detail
 from sync_data.tool.notion import base
 from sync_data.utils.http_utils import RequestUtils
@@ -22,6 +23,31 @@ def get_multi_select_body(data_list):
     # print(new_list_tmp)
     str_new = ','.join(new_list_tmp)
     return  "[" + str_new + "]"
+
+def get_non_null_params_body(property_type, property_params):
+    """
+    获取非空的body
+
+    :param body_dict:
+    :param property_name: 数据库属性名字
+    :param property_type: 数据库属性类型
+    :param property_params: 数据库要传入的参数
+    :return: 字典类型的body
+    """
+    body_dict = {}
+    if property_params:
+        if property_type == DatabaseProperty.NUMBER.value:
+            body_dict.update(number=property_params)
+        elif property_type == DatabaseProperty.URL.value:
+            body_dict.update(url=f"https://isbnsearch.org/isbn/{property_params}")
+        elif property_type == DatabaseProperty.SELECT.value:
+            tmp_dict = {}
+            tmp_dict.update(name=property_params)
+            body_dict.update(select=tmp_dict)
+            # body_dict["select"].update(name=property_params)
+        return body_dict
+    else:
+        return body_dict
 
 def get_body(data_dict, database_id, media_status, media_type):
     """
@@ -48,7 +74,7 @@ def get_body(data_dict, database_id, media_status, media_type):
         status = ""
         music_status = ""
 
-    log_detail.info(f"【RUN】{media_type}数据信息整理为json格式")
+    log_detail.info(f"【RUN】- {media_type}数据信息整理为json格式")
     rating = data_dict[MediaInfo.RATING_F.value]
     # rating = float(rat) if rat == "" else 0
     if media_type == MediaType.MUSIC.value:
@@ -75,9 +101,6 @@ def get_body(data_dict, database_id, media_status, media_type):
                         }
                     }]
                 },
-                "评分": {
-                    "number": rating
-                },
                 "表演者": {
                     "rich_text": [{
                         "type": "text",
@@ -101,6 +124,18 @@ def get_body(data_dict, database_id, media_status, media_type):
                 }
             }
         }
+        # 评分
+        if data_dict[MediaInfo.RATING_F.value]:
+            rating_f = float(data_dict[MediaInfo.RATING_F.value])
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=rating_f)
+            body["properties"]["评分"] = tmp_dict
+
+        # 评分人数
+        if data_dict[MediaInfo.ASSESS.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=data_dict[MediaInfo.ASSESS.value])
+            body["properties"]["评分人数"] = tmp_dict
         return body
     elif media_type == MediaType.MOVIE.value:
 
@@ -159,12 +194,6 @@ def get_body(data_dict, database_id, media_status, media_type):
                 "IMDb": {
                     "url": f"https://www.imdb.com/title/{data_dict[MediaInfo.IMDB.value]}"
                 },
-                "评分": {
-                    "number": data_dict[MediaInfo.RATING_F.value]
-                },
-                "评分人数": {
-                    "number": int(data_dict[MediaInfo.ASSESS.value])
-                },
                 "标记状态": {
                     "select": {
                         "name": f"{status}"
@@ -197,6 +226,19 @@ def get_body(data_dict, database_id, media_status, media_type):
                 }
             }
         }
+
+        # 评分
+        if data_dict[MediaInfo.RATING_F.value]:
+            rating_f = float(data_dict[MediaInfo.RATING_F.value])
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=rating_f)
+            body["properties"]["评分"] = tmp_dict
+
+        # 评分人数
+        if data_dict[MediaInfo.ASSESS.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=data_dict[MediaInfo.ASSESS.value])
+            body["properties"]["评分人数"] = tmp_dict
         return body
     elif media_type == MediaType.BOOK.value:
         body = {
@@ -213,9 +255,6 @@ def get_body(data_dict, database_id, media_status, media_type):
                         }
                     }]
                 },
-                "ISBN": {
-                    "url": f"https://isbnsearch.org/isbn/{data_dict[MediaInfo.ISBN.value]}"
-                },
                 "封面": {
                     "files": [{
                         "type": "external",
@@ -224,9 +263,6 @@ def get_body(data_dict, database_id, media_status, media_type):
                             "url": data_dict[MediaInfo.IMG.value]
                         }
                     }]
-                },
-                "评分": {
-                    "number": rating
                 },
                 "作者": {
                     "rich_text": [{
@@ -241,20 +277,6 @@ def get_body(data_dict, database_id, media_status, media_type):
                         "name": data_dict[MediaInfo.PUB_DATE.value][0:4]
                     }
                 },
-                "出版社": {
-                    "select": {
-                        "name": data_dict[MediaInfo.PUBLISHER.value]
-                    }
-                },
-                "价格": {
-                    "number": float(data_dict[MediaInfo.PRICE.value])
-                },
-                "评分人数": {
-                    "number": int(data_dict[MediaInfo.ASSESS.value])
-                },
-                "页数": {
-                    "number": int(data_dict[MediaInfo.PAGES.value])
-                },
                 "标记状态": {
                     "select": {
                         "name": f"{status}"
@@ -265,6 +287,45 @@ def get_body(data_dict, database_id, media_status, media_type):
                 }
             }
         }
+
+        #  ISBN
+        if data_dict[MediaInfo.ISBN.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.URL.value,
+                                                 property_params=data_dict[MediaInfo.ISBN.value])
+            body["properties"]["ISBN"] = tmp_dict
+
+        # 价格
+        if data_dict[MediaInfo.PRICE.value]:
+            tmp_float = float(data_dict[MediaInfo.PRICE.value])
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=tmp_float)
+            body["properties"]["价格"] = tmp_dict
+
+        # 评分
+        if data_dict[MediaInfo.RATING_F.value]:
+            rating_f = float(data_dict[MediaInfo.RATING_F.value])
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                   property_params=rating_f)
+            body["properties"]["评分"] = tmp_dict
+
+        # 评分人数
+        if data_dict[MediaInfo.ASSESS.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                   property_params=data_dict[MediaInfo.ASSESS.value])
+            body["properties"]["评分人数"] = tmp_dict
+
+        # 页数
+        if data_dict[MediaInfo.PAGES.value]:
+            pages_num = int(data_dict[MediaInfo.PAGES.value])
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                  property_params=pages_num)
+            body["properties"]["页数"] = tmp_dict
+
+        # 出版社
+        if data_dict[MediaInfo.PUBLISHER.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
+                                                property_params=data_dict[MediaInfo.PUBLISHER.value])
+            body["properties"]["出版社"] = tmp_dict
         return body
 
 
@@ -393,7 +454,7 @@ def create_database(token, page_id, media_type):
         exit(f"网络请求错误:{err}")
 
 
-def update_database(data_dict, database_id, token, media_status, media_type):
+def get_flag_update_database(data_dict, database_id, token, media_status, media_type):
     """
     写入数据库
 
@@ -416,11 +477,13 @@ def update_database(data_dict, database_id, token, media_status, media_type):
                        headers=page_data.get_headers(),
                        params=body)
         if res.status_code == 200:
-            log_detail.info(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{data_dict["url"]}')
-            return None
+            # log_detail.info(f'【RUN】- 导入《{data_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{data_dict["url"]}')
+            return "succeed"
         else:
-            log_detail.error(f'【RUN】导入《{data_dict[MediaInfo.TITLE.value]}》失败：{res.content}！媒体链接：{data_dict["url"]}')
+            log_detail.warn(f'【RUN】导入失败：{res.content}！')
+            return "failed"
     except Exception as err:
-        log_detail.error(f'【RUN】导入数据库错误：{err}！媒体链接：{data_dict["url"]}')
+        log_detail.error(f'【RUN】导入异常：{err}！')
+        return "exception"
 
 

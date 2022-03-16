@@ -53,5 +53,5 @@ def get_notion_media_status(token, database_id, media_url):
         return "不存在"
     else:
         notion_media_status = data_json['results'][0]['properties']['标记状态']['select']['name']
-        log_detail.debug(f"【RUN】数据库中的状态为：{notion_media_status}")
+        log_detail.debug(f"【RUN】- 数据库中的状态为：{notion_media_status}")
         return notion_media_status

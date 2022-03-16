@@ -24,7 +24,7 @@ class ParserHtmlText:
         """
         解析个人wish/do/collect内容的每个url
 
-        :return: { url_list: [url数组], monitoring_info: [符合日期的个数,是否继续]}
+        :return: url_list: [url数组], monitoring_info: [符合日期的个数,是否继续]
         """
         record_key = 0
         url_list = []
@@ -48,9 +48,9 @@ class ParserHtmlText:
                     num += 1
 
                 # 获取当天时间
+                # today = datetime.datetime.now()
                 today = datetime.datetime.now()
-                today = datetime.datetime.now()
-                log_detail.warn(f"【RUN】当前时间为：{today}")
+                log_detail.debug(f"【RUN】- 当前时间为：{today}")
 
                 # 判断 标记时间
                 # 符合监控日期内媒体个数计数
@@ -59,32 +59,34 @@ class ParserHtmlText:
                     mark_date_i = datetime.datetime.strptime(mark_date_dict.get(key), '%Y-%m-%d')
                     interval = today - mark_date_i
                     if interval.days <  monitoring_day:
-                        log_detail.debug(f'第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
+                        log_detail.debug(f'【RUN】-- 第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
                         count_num += 1
                     else:
-                        log_detail.debug(f"第{count_num}个的{key}数据{mark_date_i}超出时间范围，不处理")
-                        record_key = int(key)
+                        log_detail.debug(f"【RUN】-- 第{count_num}个的{key}数据{mark_date_i}超出时间范围，不处理")
+                        # record_key = int(key)
                         break
-                log_detail.debug(f"【RUN】监控日期内，对应的位置{record_key}")
+                log_detail.debug(f"【RUN】-- 监控日期内，对应的位置{count_num}")
             else:
                 # 如果没有监控日期，与媒体个数相同即可
-                record_key = len(url_list)
+                # record_key = len(url_list)
                 count_num = len(url_list)
 
             # 如果该页媒体为15，且监控没有限制或者都在监控日期内，则继续获取下一页内容
             if len(url_list) == 15 and count_num == len(url_list):
                 continue_request = True
+                # record_key = count_num
             else:
                 continue_request = False
+                # record_key = count_num
 
-            monitoring_info[0] = record_key
+            monitoring_info[0] = count_num
             monitoring_info[1] = continue_request
             url_dict["url_list"] = url_list
             url_dict["monitoring_info"] = monitoring_info
             return url_dict
 
         except Exception as err:
-            log_detail.warn(f"【RUN】解析失败：{err}")
+            log_detail.warn(f"【RUN】- 解析失败：{err}")
             return url_dict
 
     def get_url_list(self):
@@ -115,7 +117,7 @@ class ParserHtmlText:
             return self.dict
         except Exception as err:
             log_detail.warn(f"【RUN】解析失败：{err}")
-            return []
+            return {}
 
     def __parser(self, media_type):
         # parser_dict = {}
@@ -132,7 +134,7 @@ class ParserHtmlText:
             pass
 
     def __get_book_dict(self):
-        log_detail.debug("【RUN】解析书籍信息")
+        log_detail.debug("【RUN】- 解析书籍信息")
         # 标签名不加任何修饰，类名前加点，id名前加#
         info = self.soup.select('#info')
         infos = list(info[0].strings)
@@ -153,13 +155,19 @@ class ParserHtmlText:
 
         # 出版社 副标题 出版年 页数 定价 ISBN
         book_publisher = infos[infos.index('出版社:') + 1] if '出版社:' in infos else ""
+        book_publisher = get_single_info_str(str_list=infos, str_key="出版社:")
         book_publisher = book_publisher.replace(',', '')
         book_subhead = infos[infos.index('副标题:') + 1] if '副标题:' in infos else ""
+        book_subhead = get_single_info_str(str_list=infos, str_key="副标题:")
         book_pub_date = infos[infos.index('出版年:') + 1] if '出版年:' in infos else ""
+        book_pub_date = get_single_info_str(str_list=infos, str_key="出版年:")
         book_pages = infos[infos.index('页数:') + 1] if '页数:' in infos else ""
+        book_pages = get_single_info_str(str_list=infos, str_key="页数:")
         book_price = infos[infos.index('定价:') + 1] if '定价:' in infos else ""
+        book_price = get_single_info_str(str_list=infos, str_key="定价:")
         # https://isbnsearch.org/isbn/{ISBN}
         book_isbn = infos[infos.index('ISBN:') + 1] if 'ISBN:' in infos else ""
+        book_isbn = get_single_info_str(str_list=infos, str_key="ISBN:")
 
         # 评分 评价数 图片网址
         rating_list = get_media_rating_list(self.soup)
@@ -191,7 +199,7 @@ class ParserHtmlText:
         return book_dict
 
     def __get_music_dict(self):
-        log_detail.debug("【RUN】解析音乐信息")
+        log_detail.debug("【RUN】- 解析音乐信息")
         info = self.soup.select('#info')
         infos = list(info[0].strings)
         infos = [i.strip() for i in infos if i.strip() != '']
@@ -211,21 +219,19 @@ class ParserHtmlText:
 
         # 流派 专辑类型 介质 发行时间 出版者 条形码
         music_genre = infos[infos.index('流派:') + 1] if '流派:' in infos else ""
+        music_genre = get_single_info_str(str_list=infos, str_key="流派:")
         album_type = infos[infos.index('专辑类型:') + 1] if '专辑类型:' in infos else ""
+        album_type = get_single_info_str(str_list=infos, str_key="专辑类型:")
         music_medium = infos[infos.index('介质:') + 1] if '介质:' in infos else ""
+        music_medium = get_single_info_str(str_list=infos, str_key="介质:")
         music_release_date = infos[infos.index('发行时间:') + 1] if '发行时间:' in infos else ""
+        music_release_date = get_single_info_str(str_list=infos, str_key="发行时间:")
         music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
+        music_isrc = get_single_info_str(str_list=infos, str_key="条形码:")
+
 
         # 评分 评价数 图片url
-        # rating = self.soup.select("#interest_sectl > div > div.rating_self.clearfix > strong")
-        # music_rating = rating[0].contents[0] if rating else 0
         rating_list = get_media_rating_list(self.soup)
-
-
-        # music_assesses = self.soup.select(
-        #     "#rating_right > div.rating_sum > a")
-        # # print(music_assesses)
-        # music_assess = music_assesses[0].contents[0] if music_assesses else ""
         music_img = self.soup.select("#mainpic > span > a > img")[0].attrs['src']
 
         music_dict[MediaInfo.TITLE.value] = title
@@ -242,7 +248,7 @@ class ParserHtmlText:
 
 
     def __get_movie_dict(self):
-        log_detail.debug("【RUN】解析影视信息")
+        log_detail.debug("【RUN】- 解析影视信息")
         # 标签名不加任何修饰，类名前加点，id名前加#
         info = self.soup.select('#info')
         infos = list(info[0].strings)
@@ -256,18 +262,18 @@ class ParserHtmlText:
 
         # 导演
         if '导演' in infos:
-            movie_director = multiple_infos_parser(infos, '导演', 2)
+            movie_director = get_multiple_infos_list(infos, '导演', 2)
         else:
             movie_director = ""
 
         # 编剧 主演 类型
-        screenwriter = multiple_infos_parser(infos, "编剧", 2)
-        starring = multiple_infos_parser(infos, "主演", 2)
-        movie_type = multiple_infos_parser(infos, "类型:" , 1)
+        screenwriter = get_multiple_infos_list(infos, "编剧", 2)
+        starring = get_multiple_infos_list(infos, "主演", 2)
+        movie_type = get_multiple_infos_list(infos, "类型:", 1)
 
         # 国家或地区 语言
-        c_or_r = get_simple_info_list(infos, "制片国家/地区:")
-        language_list = get_simple_info_list(infos, "语言:")
+        c_or_r = get_single_info_list(infos, "制片国家/地区:")
+        language_list = get_single_info_list(infos, "语言:")
 
         # 分类 电影和电视剧 以及 动画片（电影）和动漫（剧集）
         if '上映时间:' in infos or '上映日期:' in infos:
@@ -295,7 +301,6 @@ class ParserHtmlText:
         related_info = self.soup.select("#content > div > div.article > div > div.indent > span")
         related_infos = get_media_related_infos(related_info)
 
-        # print(rating_infos)
 
         movie_dict[MediaInfo.TITLE.value] = movie_title
         movie_dict[MediaInfo.DIRECTOR.value] = movie_director
@@ -312,39 +317,56 @@ class ParserHtmlText:
         movie_dict[MediaInfo.RELATED.value] = related_infos
         return movie_dict
 
-    def get_music(self):
-        infos = self.__get_music_dict()
-        # log_detail.info(f"{infos}")
-        return infos
+    # def get_music(self):
+    #     infos = self.__get_music_dict()
+    #     return infos
 
-def get_simple_info_list(str_dict, str_key):
+def get_single_info_str(str_list, str_key):
+    return str_list[str_list.index(str_key) + 1] if str_key in str_list else ""
+
+def get_single_info_list(infos_list, str_key):
+    """
+    获取豆瓣信息， 针对豆瓣:和关键字在一起的
+
+    :param infos_list: 字符串列表
+    :param str_key: 字符串字典关键字
+    :return: 对应key值信息的列表
+    """
     str_list = []
     try:
-        if str_key in str_dict:
-            data_list_tmp = str_dict[str_dict.index(str_key) + 1]
+        if str_key in infos_list:
+            data_list_tmp = infos_list[infos_list.index(str_key) + 1]
             data_list_tmp = data_list_tmp.split('/')
 
             for i in data_list_tmp:
                 str_list.append(i.strip(' '))
         else:
-            log_detail.warn(f"【RUN】未解析到<{str_key}>信息")
+            log_detail.warn(f"【RUN】- 未解析到<{str_key}>信息")
         return str_list
     except Exception as err:
-        log_detail.error(f"【RUN】未解析到<{str_key}>信息:{err}")
+        log_detail.error(f"【RUN】- 未解析到<{str_key}>信息:{err}")
         return str_list
 
-def multiple_infos_parser(str_dict, str_key, next_number):
+def get_multiple_infos_list(infos_list, str_key, next_number):
+    """
+    解析媒体info, 必须豆瓣中是':'和名称不一起的数据
+
+    :param infos_list: 字符串列表
+    :param str_key: 字符串字典关键字
+    :param next_number: 豆瓣中/的位置
+    :return: 对应key值信息的列表
+    """
     str_list = []
     try:
-        if str_key in str_dict:
+        if str_key in infos_list:
 
-            first_index = str_dict.index(str_key) + next_number
-            str_list.append(str_dict[first_index])
+            first_index = infos_list.index(str_key) + next_number
+            str_list.append(infos_list[first_index])
             next_index = first_index
             while True:
-                if str_dict[next_index + 1] == '/':
+                if infos_list[next_index + 1] == '/':
                     next_index += 2
-                    str_list.append(str_dict[next_index])
+                    str_list.append(infos_list[next_index])
                 else:
                     break
         else:
@@ -355,6 +377,12 @@ def multiple_infos_parser(str_dict, str_key, next_number):
         return  str_list
 
 def get_media_rating_list(soup):
+    """
+    获取媒体评分
+
+    :param soup:
+    :return: 返回一个评分list, 0-float型评分，1-int型评分人数
+    """
     rating_list = ['0', '0']
     try:
         rating_info = soup.select("#interest_sectl > div > div.rating_self.clearfix")
@@ -372,6 +400,12 @@ def get_media_rating_list(soup):
         return rating_list
 
 def get_media_related_infos(info):
+    """
+    获取媒体简介
+
+    :param info:
+    :return: 媒体简介 str类型
+    """
     try:
         if info:
             related_infos = list(info[0].strings)
