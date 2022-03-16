@@ -151,12 +151,15 @@ def get_monitoring_and_update(instance,
                 time_number = random.random()
                 log_detail.debug(f"【RUN】- notion随机访问休眠时间0-1s，本次休眠：{time_number}s")
 
-                # 如果存在，对比标记状态是否改变
-                if notion_media_status != now_status:
-                    log_detail.warn("【RUN】豆瓣标记状态已经改变,notion状态同步功能暂不支持！")
-                else:
-                    jump_number += 1
-                    log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
+                jump_number += 1
+                log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
+
+                # # 如果存在，对比标记状态是否改变 TODO 更新notion数据库
+                # if notion_media_status != now_status:
+                #     log_detail.warn("【RUN】豆瓣标记状态已经改变,notion状态同步功能暂不支持！")
+                # else:
+                #     jump_number += 1
+                #     log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
 
         log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
         log_detail.info(f"【RUN】 - 第{page_number}页监控数据个数：{monitoring_info[0]}")
@@ -174,6 +177,7 @@ def get_monitoring_and_update(instance,
         if monitoring_info[1] is False:
             break
         if url_num > 14:
+            # 翻页处理
             start_number += 15
         else:
             break
