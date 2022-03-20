@@ -32,13 +32,13 @@
 
 ## [更新日志](https://github.com/Qliangw/notion_sync_data/blob/main/CHANGELOG.rst)
 
-## [使用方法](https://ptest.notion.site/notion_sync_data-3d774621eda447c2a1428d2d3b118867)
+## [使用方法](https://qliangw.notion.site/)
 
 ## 页面展示
 
-[豆瓣书单](https://ptest.notion.site/880fef10dbd34a54a0072ae43544946f?v=fa44930d5a2340a7bb62de25edad93b3)
+[豆瓣书单](https://qliangw.notion.site/25dbf612997f43f4a2a7f2156a11d3ae?v=05ce09bfaaaa46058215b13ad4b60b0d)
 
-[豆瓣影视](https://ptest.notion.site/149aeb4ecc62484e85d00f19520cf38b?v=754fe0acbed643cca8efa9a881c225d3)
+[豆瓣影视](https://qliangw.notion.site/fe986bd915ac49a2a587db9da3ffb9db?v=d8acb239433b4c9da9c7ec6107c882c2)
 
 
 ## 鸣谢
