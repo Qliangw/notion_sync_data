@@ -46,6 +46,12 @@
 
 [豆瓣影视](https://qliangw.notion.site/fe986bd915ac49a2a587db9da3ffb9db?v=d8acb239433b4c9da9c7ec6107c882c2)
 
+## 其他
+
+先进入微信群吧，没有时间更新，也没有时间来这里回复
+
+![weixin](https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/mmexport1659093124700~2.jpg)
+
 
 ## 鸣谢
 
