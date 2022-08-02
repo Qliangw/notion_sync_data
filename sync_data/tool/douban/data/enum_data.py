@@ -41,6 +41,9 @@ class MediaInfo(Enum):
     ASSESS = 'assess'                   # 评价数
     RELATED = "related_infos"
 
+    RATING_SELF = "rating_self"         # 个人评分
+    COMMENT_SELF = "comment"            # 个人短评
+
     # 书籍
     AUTHOR = "author"                   # 作者
     PUBLISHER = "publisher"             # 出版社

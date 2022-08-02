@@ -39,9 +39,9 @@ def get_monitoring_and_update(instance,
     :return:
     """
     # 解析出错的url
-    parser_err_url_list = []
+    parser_err_item_list = []
     # 导入notion出错的url
-    update_err_url_list = []
+    update_err_item_list = []
 
     jump_number = 0
     page_monitoring_number = 0
@@ -61,12 +61,12 @@ def get_monitoring_and_update(instance,
         info_instance = ParserHtmlText(html_text)
         # 获取全部url TODO 获取标记时间->主要针对书籍
         url_dict = info_instance.get_url_dict(monitoring_day=monitoring_day)
-        url_list = url_dict["url_list"]
+        item_list = url_dict["item_list"]
         log_detail.debug(f"【RUN】- 获取本页所有{media_type}的链接")
 
         # 记录for循环次数，即解析url的次数
         count_num = 0
-        url_num = len(url_list)
+        url_num = len(item_list)
         monitoring_info = url_dict["monitoring_info"]
         log_detail.info(f"【RUN】- 第{page_number}页共有媒体个数：{url_num}")
         log_detail.info(f"【RUN】- 第{page_number}页监控日期内数据个数：{monitoring_info[0]}")
@@ -75,7 +75,7 @@ def get_monitoring_and_update(instance,
         update_err_number = 0
         parser_err_number = 0
         # 解析该页媒体的每个url
-        for url in url_list:
+        for item in item_list:
 
             if count_num == monitoring_info[0] and monitoring_info[1] is False:
                 log_detail.info("【RUN】- 其他媒体不在监控时间内，结束导入")
@@ -93,6 +93,11 @@ def get_monitoring_and_update(instance,
                 now_status = "在看"
             elif media_status == MediaStatus.COLLECT.value:
                 now_status = "看过"
+        
+            url = item["url"]
+            mark_date = item["mark_date"]
+            comment = item["comment"]
+            rating = item["rating"] 
 
             # 查询数据库中是否存在该媒体，通过检索url唯一值
             notion_media_status = get_notion_media_status(token=token,
@@ -117,9 +122,12 @@ def get_monitoring_and_update(instance,
                     # 添加url
                     if html_dict:
                         html_dict[MediaInfo.URL.value] = url
+                        html_dict[MediaInfo.RATING_SELF.value] = rating
+                        html_dict[MediaInfo.COMMENT_SELF.value] = comment
+                        html_dict[MediaInfo.STATUS_DATE.value] = mark_date
                     else:
                         log_detail.warn(f"【RUN】- 解析该页面出现问题，媒体链接：{url}")
-                        parser_err_url_list.append(url)
+                        parser_err_item_list.append(url)
                         parser_err_number += 1
                         continue
 
@@ -131,11 +139,11 @@ def get_monitoring_and_update(instance,
                     if opt_status == "succeed":
                         log_detail.info(f'【RUN】- 导入《{html_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{url}')
                     elif opt_status == "failed":
-                        update_err_url_list.append(url)
+                        update_err_item_list.append(url)
                         update_err_number += 1
                         log_detail.warn(f'【RUN】- 导入《{html_dict[MediaInfo.TITLE.value]}》失败！媒体链接：{url}')
                     elif opt_status == "exception":
-                        update_err_url_list.append(url)
+                        update_err_item_list.append(url)
                         log_detail.error(f'【RUN】捉到Bug了,请您反馈！')
 
                     # 随机休眠5-10秒钟
@@ -143,7 +151,7 @@ def get_monitoring_and_update(instance,
                     log_detail.info(f"【RUN】- 访问豆瓣时随机休眠时间1-10s，本次休眠：{time_number}s")
                 else:
                     log_detail.warn(f"【RUN】- 访问该页面出现问题，媒体链接：{url}")
-                    parser_err_url_list.append(url)
+                    parser_err_item_list.append(url)
                     continue
 
             else:
@@ -185,25 +193,25 @@ def get_monitoring_and_update(instance,
     # print(monitoring_info)
     log_detail.info(f"【RUN】您的标记 <{media_status}> 状态的 <{media_type}> 已导入notion")
     log_detail.info(f"【RUN】 - 共计访问页数：{page_number}")
-    log_detail.info(f"【RUN】 -- 访问数据个数：{(page_number - 1) * 15 + len(url_list)}")
+    log_detail.info(f"【RUN】 -- 访问数据个数：{(page_number - 1) * 15 + len(item_list)}")
     log_detail.info(f"【RUN】 -- 监控数据个数：{page_monitoring_number}")
     log_detail.info(f"【RUN】 -- 跳过数据个数：{page_jump_number}")
     # log_detail.info(f"【RUN】 -- 修改数据个数：{page_monitoring_number - page_jump_number}")
     log_detail.info(f"【RUN】 -- 导入数据个数：{page_monitoring_number - page_jump_number}")
 
     # 如果存在解析失败的媒体，则打印出媒体链接
-    log_detail.info(f"【RUN】 -- 解析失败个数：{len(parser_err_url_list)}")
-    if parser_err_url_list:
-        for i in range(0, len(parser_err_url_list)):
-            log_detail.info(f"【RUN】 --- 第{i + 1}个媒体链接：{parser_err_url_list[i]}")
+    log_detail.info(f"【RUN】 -- 解析失败个数：{len(parser_err_item_list)}")
+    if parser_err_item_list:
+        for i in range(0, len(parser_err_item_list)):
+            log_detail.info(f"【RUN】 --- 第{i + 1}个媒体链接：{parser_err_item_list[i]}")
 
     # 如果存在导入失败的媒体，则打印出媒体链接
-    log_detail.info(f"【RUN】 -- 导入失败个数：{len(update_err_url_list)}")
-    if update_err_url_list:
-        for i in range(0, len(update_err_url_list)):
-            log_detail.info(f"【RUN】 --- 第{i+1}个媒体链接：{update_err_url_list[i]}")
+    log_detail.info(f"【RUN】 -- 导入失败个数：{len(update_err_item_list)}")
+    if update_err_item_list:
+        for i in range(0, len(update_err_item_list)):
+            log_detail.info(f"【RUN】 --- 第{i+1}个媒体链接：{update_err_item_list[i]}")
 
-    return parser_err_url_list
+    return parser_err_item_list
 
 
 
@@ -249,7 +257,7 @@ def start_sync(media_type, media_status):
 
     # 从第0个媒体开始获取
     start_number = 0
-    err_url_list = get_monitoring_and_update(instance=douban_instance,
+    err_item_list = get_monitoring_and_update(instance=douban_instance,
                                              monitoring_day=monitoring_day,
                                              user_id=user_id,
                                              media_type=media_type,

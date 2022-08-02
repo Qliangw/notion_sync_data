@@ -27,37 +27,31 @@ class ParserHtmlText:
         :return: url_list: [url数组], monitoring_info: [符合日期的个数,是否继续]
         """
         record_key = 0
-        url_list = []
+        item_list = []
         continue_request = True
         monitoring_info = [0, continue_request]
-        url_dict = {}
+        items_dict = {}
+
+        today = datetime.datetime.now()
+        log_detail.debug(f"【RUN】- 当前时间为：{today}")
+        count_num = 0
+
         try:
-            info = self.soup.select('.nbg')
-            for url in info:
-                url_list.append(url.get('href'))
+            info = self.soup.select('.subject-item')
+            for item in info:
+                item_dict = {}
 
-            if monitoring_day != 0:
-                mark_date = self.soup.select('span.date')
-                # 处理所有标记时间
-                num = 0
-                mark_date_dict = {}
-                while num < len(mark_date):
-                    mark_date_dict[num] = list(mark_date[num].strings)
-                    # mark_date_dict[num] = ''.join([i.rstrip()[:-9] for i in mark_date_dict[num] if i.strip() != ''])
-                    mark_date_dict[num] = ''.join([i.split("\n", 1)[0] for i in mark_date_dict[num] if i.strip() != ''])
-                    num += 1
-
-                # 获取当天时间
-                # today = datetime.datetime.now()
-                today = datetime.datetime.now()
-                log_detail.debug(f"【RUN】- 当前时间为：{today}")
+                url = item.select('.nbg')[0].get('href')
+                item_dict["url"] = url
+               
+                mark_date_span = list(item.select('span.date')[0].strings)
+                mark_date_string = ''.join([i.split("\n", 1)[0] for i in mark_date_span if i.strip() != ''])
+                mark_date =  datetime.datetime.strptime(mark_date_string, '%Y-%m-%d')
 
                 # 判断 标记时间
                 # 符合监控日期内媒体个数计数
-                count_num = 0
-                for key in mark_date_dict:
-                    mark_date_i = datetime.datetime.strptime(mark_date_dict.get(key), '%Y-%m-%d')
-                    interval = today - mark_date_i
+                if monitoring_day != 0:
+                    interval = today - mark_date
                     if interval.days <  monitoring_day:
                         log_detail.debug(f'【RUN】-- 第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
                         count_num += 1
@@ -65,14 +59,35 @@ class ParserHtmlText:
                         log_detail.debug(f"【RUN】-- 第{count_num}个的{key}数据{mark_date_i}超出时间范围，不处理")
                         # record_key = int(key)
                         break
-                log_detail.debug(f"【RUN】-- 监控日期内，对应的位置{count_num}")
-            else:
+                # mark_date = list(item.select('span.date')[0].strings)
+
+                # log_detail.info(f"【RUN】rating：{comment}")
+
+                item_dict["mark_date"] = mark_date.isoformat()
+
+                rating = item.find_all(class_=re.compile("rating"))
+                if len(rating) > 0:
+                    item_dict["rating"] = rating[0]['class'][0]
+                else:
+                    item_dict["rating"] = ''
+                
+                comment = item.select('p.comment')
+                if len(comment) > 0:
+                    item_dict["comment"] = comment[0].string.strip()
+                else:
+                    item_dict["rating"] = ''
+                
+                log_detail.debug(f"【RUN】item dict：{item_dict}")
+                item_list.append(item_dict)
+            
+            if monitoring_day == 0:
                 # 如果没有监控日期，与媒体个数相同即可
-                # record_key = len(url_list)
-                count_num = len(url_list)
+                count_num = len(item_list)
+            
+            log_detail.debug(f"【RUN】-- 监控日期内，对应的位置{count_num}")
 
             # 如果该页媒体为15，且监控没有限制或者都在监控日期内，则继续获取下一页内容
-            if len(url_list) == 15 and count_num == len(url_list):
+            if len(item_list) == 15 and count_num == len(item_list):
                 continue_request = True
                 # record_key = count_num
             else:
@@ -81,13 +96,13 @@ class ParserHtmlText:
 
             monitoring_info[0] = count_num
             monitoring_info[1] = continue_request
-            url_dict["url_list"] = url_list
-            url_dict["monitoring_info"] = monitoring_info
-            return url_dict
+            items_dict["item_list"] = item_list
+            items_dict["monitoring_info"] = monitoring_info
+            return items_dict
 
         except Exception as err:
             log_detail.warn(f"【RUN】- 解析失败：{err}")
-            return url_dict
+            return items_dict
 
     def get_url_list(self):
         """

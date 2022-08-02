@@ -282,8 +282,21 @@ def get_body(data_dict, database_id, media_status, media_type):
                         "name": f"{status}"
                     }
                 },
+                "标记时间": {
+                    "date": {
+                        "start":data_dict[MediaInfo.STATUS_DATE.value]
+                    }
+                },
                 "豆瓣链接": {
                     "url": f"{data_dict[MediaInfo.URL.value]}"
+                },
+                "短评": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.COMMENT_SELF.value]
+                        }
+                    }]
                 }
             }
         }
@@ -300,6 +313,15 @@ def get_body(data_dict, database_id, media_status, media_type):
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
                                                 property_params=tmp_float)
             body["properties"]["价格"] = tmp_dict
+
+        # 个人评分 ratingX-t
+        if data_dict[MediaInfo.RATING_SELF.value]:
+            rating_self = data_dict[MediaInfo.RATING_SELF.value]
+            rating_number = int(re.findall(r'\d+', rating_self)[0])
+            rating_star = "⭐" * rating_number
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
+                                                property_params=rating_star)
+            body["properties"]["个人评分"] = tmp_dict
 
         # 评分
         if data_dict[MediaInfo.RATING_F.value]:
