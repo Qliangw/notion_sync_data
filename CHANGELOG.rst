@@ -13,6 +13,11 @@
 
 [Unreleased]
 ============
+`[v0.1.2-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1...v0.1.2-alpha>`_ - 2022-08-23
+========================
+- fix: 修初始化数据库失败的问题 `[issues#18] <https://github.com/Qliangw/notion_sync_data/issues/18>`_
+
+
 `[v0.1.1] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1-beta...v0.1.1>`_ - 2022-03-16
 ========================
 - fix: 修复书籍信息（出版社、评分、评分人数、页数等）不全无法正常导入的问题

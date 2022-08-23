@@ -14,7 +14,7 @@
 
 
 
-**最新版本：**[v0.1.1](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.1)
+**最新版本：**[v0.1.2-alpha](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.2-alpha)
 
 ## 功能
 
@@ -25,11 +25,7 @@
 
 **TODO**
 
-**声明：因个人原因没有时间去学习Python，因而导致该项目停更了两个月，最近越来越忙，故跟使用者道歉，待有时间后（预计三个月后）会把TODO的东西要加上！！！**
-
-**声明：因个人原因没有时间去学习Python，因而导致该项目停更了两个月，最近越来越忙，故跟使用者道歉，待有时间后（预计三个月后）会把TODO的东西要加上！！！**
-
-**声明：因个人原因没有时间去学习Python，因而导致该项目停更了两个月，最近越来越忙，故跟使用者道歉，待有时间后（预计三个月后）会把TODO的东西要加上！！！**
+### 鸽了那么久，更新了一下，只是修了notion调整的接口带来的Bug 
 
 - [ ] 添加GUI（学习中
 - [ ] notion根据豆瓣信息变化进行更新（标记状态、评分、评分人数）
@@ -45,12 +41,6 @@
 [豆瓣书单](https://qliangw.notion.site/25dbf612997f43f4a2a7f2156a11d3ae?v=05ce09bfaaaa46058215b13ad4b60b0d)
 
 [豆瓣影视](https://qliangw.notion.site/fe986bd915ac49a2a587db9da3ffb9db?v=d8acb239433b4c9da9c7ec6107c882c2)
-
-## 其他
-
-先进入微信群吧，没有时间更新，也没有时间来这里回复
-
-![weixin](https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/img/mmexport1659093124700~2.jpg)
 
 
 ## 鸣谢
