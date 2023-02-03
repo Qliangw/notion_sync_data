@@ -13,6 +13,9 @@
 > 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
 
 
+
+**最新版本：**[v0.1.2-alpha](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.2-alpha)
+
 ## 功能
 
 - [x] 豆瓣【影、音、书】的信息
@@ -22,19 +25,22 @@
 
 **TODO**
 
-- [ ] 添加GUI或者Web
-- [ ] 适配Win和Mac的可执行程序
+### 鸽了那么久，更新了一下，只是修了notion调整的接口带来的Bug 
+
+- [ ] 添加GUI（学习中
+- [ ] notion根据豆瓣信息变化进行更新（标记状态、评分、评分人数）
+- [ ] 主要针对书籍标记信息添加一列【阅读时间】
 - [ ] [营养成分表](https://www.tianapi.com/apiview/121)
 
 ## [更新日志](https://github.com/Qliangw/notion_sync_data/blob/main/CHANGELOG.rst)
 
-## [使用方法](https://ptest.notion.site/notion_sync_data-3d774621eda447c2a1428d2d3b118867)
+## [使用方法](https://qliangw.notion.site/)
 
 ## 页面展示
 
-[豆瓣书单](https://ptest.notion.site/880fef10dbd34a54a0072ae43544946f?v=fa44930d5a2340a7bb62de25edad93b3)
+[豆瓣书单](https://qliangw.notion.site/25dbf612997f43f4a2a7f2156a11d3ae?v=05ce09bfaaaa46058215b13ad4b60b0d)
 
-[豆瓣影视](https://ptest.notion.site/149aeb4ecc62484e85d00f19520cf38b?v=754fe0acbed643cca8efa9a881c225d3)
+[豆瓣影视](https://qliangw.notion.site/fe986bd915ac49a2a587db9da3ffb9db?v=d8acb239433b4c9da9c7ec6107c882c2)
 
 
 ## 鸣谢

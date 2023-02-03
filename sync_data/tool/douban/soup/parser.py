@@ -289,7 +289,7 @@ class ParserHtmlText:
         else:
             movie_categories = "未知"
 
-        imdb = infos[infos.index('IMDb:') + 1] if 'IMDb' in infos else ""
+        imdb = infos[infos.index('IMDb:') + 1] if 'IMDb:' in infos else ""
 
         # 评分 评价数
         rating_list = get_media_rating_list(self.soup)
