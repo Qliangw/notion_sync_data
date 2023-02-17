@@ -215,6 +215,7 @@ def start_sync(media_type, media_status):
 
     # 获取浏览器user-agent
     user_agent = config_dict[ConfigName.USER_AGENT.value]
+    user_cookie = config_dict[ConfigName.DOUBAN.value][ConfigName.USER_COOKIE.value]
     log_detail.info(f"【RUN】- 取得浏览器 user-agent：{user_agent}")
 
     # 获取豆瓣信息
@@ -244,7 +245,7 @@ def start_sync(media_type, media_status):
     log_detail.info(f"【RUN】- 取得notion的database_id：{x_database_id}")
 
     # 创建一个豆瓣实例
-    douban_instance = base.DouBanBase(user_agent=user_agent)
+    douban_instance = base.DouBanBase(user_agent=user_agent, user_cookies=user_cookie)
     log_detail.debug("【RUN】创建一个豆瓣实例")
 
     # 从第0个媒体开始获取

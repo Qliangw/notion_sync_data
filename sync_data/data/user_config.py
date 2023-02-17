@@ -8,6 +8,7 @@ from enum import Enum
 
 class ConfigName(Enum):
     USER_AGENT = "user_agent"
+    USER_COOKIE = "cookies"
     DOUBAN = "douban"
     DOUBAN_USER_ID = 'user_id'
     DOUBAN_DAY = "day"

@@ -41,7 +41,10 @@ class DouBanBase:
                 log_detail.error(f"【RUN】获取cookie失败:{format(err)}")
 
         else:
-            self.cookies = user_cookies
+            self.req = RequestUtils(request_interval_mode=True)
+            cookies = user_cookies
+            cookie_dict = requests.utils.dict_from_cookiejar(requests.utils.cookiejar_from_dict({'Cookie': cookies}))
+            self.cookie = cookie_dict
             log_detail.debug(f"【RUN】配置用户自定义cookie：{user_cookies}")
 
     def __set_cookies(self, res):

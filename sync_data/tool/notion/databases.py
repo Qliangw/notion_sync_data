@@ -274,7 +274,8 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "出版年份": {
                     "select": {
-                        "name": data_dict[MediaInfo.PUB_DATE.value][0:4]
+                        "name": data_dict[MediaInfo.PUB_DATE.value][0:4] if data_dict.get(
+                            MediaInfo.PUB_DATE.value) else "-"
                     }
                 },
                 "标记状态": {
@@ -315,8 +316,15 @@ def get_body(data_dict, database_id, media_status, media_type):
             body["properties"]["评分人数"] = tmp_dict
 
         # 页数
-        if data_dict[MediaInfo.PAGES.value]:
-            pages_num = int(data_dict[MediaInfo.PAGES.value])
+        page = data_dict[MediaInfo.PAGES.value]
+        if page:
+            pages_num = 1
+            try:
+                if page.endswith("页"):
+                    page = page[:-1]
+                pages_num = round(float(page))
+            except Exception:
+                pass
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
                                                   property_params=pages_num)
             body["properties"]["页数"] = tmp_dict
