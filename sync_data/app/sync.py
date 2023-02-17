@@ -14,7 +14,7 @@ from sync_data.tool.notion import databases
 from sync_data.tool.notion.databases import create_database
 from sync_data.tool.notion.query import get_notion_media_status
 from sync_data.utils import log_detail
-from sync_data.utils.config import Config, auto_config_database, get_auto_config, save_auto_config
+from sync_data.utils.config import Config, auto_config_database, get_auto_config
 
 
 def get_monitoring_and_update(instance,
@@ -172,7 +172,6 @@ def get_monitoring_and_update(instance,
 
         # page_err_number += int(len(err_url))
 
-
         log_detail.info("--------------------------------------------------")
         if monitoring_info[1] is False:
             break
@@ -201,11 +200,9 @@ def get_monitoring_and_update(instance,
     log_detail.info(f"【RUN】 -- 导入失败个数：{len(update_err_url_list)}")
     if update_err_url_list:
         for i in range(0, len(update_err_url_list)):
-            log_detail.info(f"【RUN】 --- 第{i+1}个媒体链接：{update_err_url_list[i]}")
+            log_detail.info(f"【RUN】 --- 第{i + 1}个媒体链接：{update_err_url_list[i]}")
 
     return parser_err_url_list
-
-
 
 
 def start_sync(media_type, media_status):
@@ -215,6 +212,7 @@ def start_sync(media_type, media_status):
 
     # 获取浏览器user-agent
     user_agent = config_dict[ConfigName.USER_AGENT.value]
+    user_cookie = config_dict[ConfigName.DOUBAN.value][ConfigName.USER_COOKIE.value]
     log_detail.info(f"【RUN】- 取得浏览器 user-agent：{user_agent}")
 
     # 获取豆瓣信息
@@ -244,7 +242,7 @@ def start_sync(media_type, media_status):
     log_detail.info(f"【RUN】- 取得notion的database_id：{x_database_id}")
 
     # 创建一个豆瓣实例
-    douban_instance = base.DouBanBase(user_agent=user_agent)
+    douban_instance = base.DouBanBase(user_agent=user_agent, user_cookies=user_cookie)
     log_detail.debug("【RUN】创建一个豆瓣实例")
 
     # 从第0个媒体开始获取
@@ -257,7 +255,6 @@ def start_sync(media_type, media_status):
                                              start_number=start_number,
                                              token=token,
                                              database_id=database_id)
-
 
 
 def init_database():
@@ -281,7 +278,9 @@ def init_database():
     init_simple_database(config_dict=auto_config, media_type=MediaType.MOVIE.value, token=token, page_id=page_id)
     init_simple_database(config_dict=auto_config, media_type=MediaType.MUSIC.value, token=token, page_id=page_id)
     log_detail.info("【RUN】数据库初始化完成。")
-    log_detail.info("【Tip】已在notion页面创建数据库，请输入<python run.py -m [book/music/movie] -s [wish/do/collect/all]>完成媒体的导入")
+    log_detail.info(
+        "【Tip】已在notion页面创建数据库，请输入<python run.py -m [book/music/movie] -s [wish/do/collect/all]>完成媒体的导入")
+
 
 def init_simple_database(config_dict, media_type, token, page_id):
     """
@@ -304,4 +303,3 @@ def init_simple_database(config_dict, media_type, token, page_id):
             log_detail.info(f"【RUN】- <{media_type}> 数据库已存在，跳过初始化！")
     except Exception as err:
         log_detail.error(f"【RUN】- 尝试创建<{media_type}> 数据库时失败。错误：{err}")
-

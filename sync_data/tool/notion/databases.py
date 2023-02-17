@@ -4,15 +4,13 @@
 # @Function: notion 数据库处理
 
 import json
-import re
-
-import requests
 
 from sync_data.tool.douban.data.enum_data import MediaInfo, MediaStatus, MediaType
+from sync_data.tool.notion import base
 from sync_data.tool.notion.data.enum_data import DatabaseProperty
 from sync_data.utils import log_detail
-from sync_data.tool.notion import base
 from sync_data.utils.http_utils import RequestUtils
+
 
 def get_multi_select_body(data_list):
     str_key = '{"name": "xxx"}'
@@ -22,7 +20,8 @@ def get_multi_select_body(data_list):
         new_list_tmp.append(new_tmp)
     # print(new_list_tmp)
     str_new = ','.join(new_list_tmp)
-    return  "[" + str_new + "]"
+    return "[" + str_new + "]"
+
 
 def get_non_null_params_body(property_type, property_params):
     """
@@ -48,6 +47,7 @@ def get_non_null_params_body(property_type, property_params):
         return body_dict
     else:
         return body_dict
+
 
 def get_body(data_dict, database_id, media_status, media_type):
     """
@@ -274,7 +274,8 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "出版年份": {
                     "select": {
-                        "name": data_dict[MediaInfo.PUB_DATE.value][0:4]
+                        "name": data_dict[MediaInfo.PUB_DATE.value][0:4] if data_dict.get(
+                            MediaInfo.PUB_DATE.value) else "-"
                     }
                 },
                 "标记状态": {
@@ -291,7 +292,7 @@ def get_body(data_dict, database_id, media_status, media_type):
         #  ISBN
         if data_dict[MediaInfo.ISBN.value]:
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.URL.value,
-                                                 property_params=data_dict[MediaInfo.ISBN.value])
+                                                property_params=data_dict[MediaInfo.ISBN.value])
             body["properties"]["ISBN"] = tmp_dict
 
         # 价格
@@ -305,20 +306,27 @@ def get_body(data_dict, database_id, media_status, media_type):
         if data_dict[MediaInfo.RATING_F.value]:
             rating_f = float(data_dict[MediaInfo.RATING_F.value])
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
-                                                   property_params=rating_f)
+                                                property_params=rating_f)
             body["properties"]["评分"] = tmp_dict
 
         # 评分人数
         if data_dict[MediaInfo.ASSESS.value]:
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
-                                                   property_params=data_dict[MediaInfo.ASSESS.value])
+                                                property_params=data_dict[MediaInfo.ASSESS.value])
             body["properties"]["评分人数"] = tmp_dict
 
         # 页数
-        if data_dict[MediaInfo.PAGES.value]:
-            pages_num = int(data_dict[MediaInfo.PAGES.value])
+        page = data_dict[MediaInfo.PAGES.value]
+        if page:
+            pages_num = 1
+            try:
+                if page.endswith("页"):
+                    page = page[:-1]
+                pages_num = round(float(page))
+            except Exception:
+                pass
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
-                                                  property_params=pages_num)
+                                                property_params=pages_num)
             body["properties"]["页数"] = tmp_dict
 
         # 出版社
@@ -485,5 +493,3 @@ def get_flag_update_database(data_dict, database_id, token, media_status, media_
     except Exception as err:
         log_detail.error(f'【RUN】导入异常：{err}！')
         return "exception"
-
-
