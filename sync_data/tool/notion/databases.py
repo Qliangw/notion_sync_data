@@ -321,6 +321,14 @@ def get_body(data_dict, database_id, media_status, media_type):
                             "content": data_dict[MediaInfo.MY_COMMENT.value]
                         }
                     }]
+                },
+                "简介": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.RELATED.value]
+                        }
+                    }]
                 }
             }
         }
@@ -659,25 +667,6 @@ def get_common_body(data_dict, status):
                     "type": "text",
                     "text": {
                         "content": data_dict[MediaInfo.MY_COMMENT.value]
-                    }
-                }]
-            },
-            # TODO:: 书名和简介的处理
-            "书名": {
-                "title": [{
-                    "type": "text",
-                    "text": {
-                        "content": data_dict[
-                                       MediaInfo.TITLE.value] + f"：{data_dict[MediaInfo.SUBHEAD.value]}" if data_dict.get(
-                            MediaInfo.SUBHEAD.value) else data_dict[MediaInfo.TITLE.value]
-                    }
-                }]
-            },
-            "简介": {
-                "rich_text": [{
-                    "type": "text",
-                    "text": {
-                        "content": data_dict[MediaInfo.RELATED.value]
                     }
                 }]
             }

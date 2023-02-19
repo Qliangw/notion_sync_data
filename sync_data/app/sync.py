@@ -145,9 +145,8 @@ def get_monitoring_and_update(instance,
                 else:
                     log_detail.warn(f"【RUN】- 访问该页面出现问题，媒体链接：{url}")
                     parser_err_url_list.append(url)
-                    continue
-            # TODO:: 死循环
-            elif True:
+            # 如果数据库中存在，则判断标记状态是否相同，不同则更新
+            elif notion_media_status != now_status:
                 log_detail.info("【RUN】豆瓣标记状态已经改变，更新数据")
                 html_text = instance.get_html_text(url=url,
                                                    user_id=user_id,
