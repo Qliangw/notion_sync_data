@@ -71,14 +71,13 @@ class DouBanBase:
         :return: html的text格式
         """
 
-        # TODO 增加参数的判断，以及一些异常的处理
         if url is None and media_type == 'game':
             url = f"https://www.douban.com/people/{user_id}/games?action={media_status}&start={start_number}"
             self.req = RequestUtils(request_interval_mode=True)
             res = self.req.get_res("https://www.douban.com/", headers=self.headers)
             cookies = res.cookies
             cookies = requests.utils.dict_from_cookiejar(cookies)
-        elif url is None and media_type == 'game':
+        elif url is None and media_type != 'game':
             url = f"https://{media_type}.douban.com/people/{user_id}/{media_status}?start={start_number}&sort=time&rating=all&filter=all&mode=grid"
             self.req = RequestUtils(request_interval_mode=True)
             res = self.req.get_res("https://www.douban.com/", headers=self.headers)

@@ -74,11 +74,11 @@ class MediaInfo(Enum):
     IMDB = "IMDb"
 
     # 游戏
-    GAME_TYPE = "game_type"
-    GAME_PUB = "game_pub"
-    GAME_DEV = "game_dev"
-    GAME_PLATFORM = "game_platform"
-    GAME_DATE = "game_date"
+    GAME_TYPE = "game_type"  # 游戏类型
+    GAME_PUB = "game_pub"  # 发行商
+    GAME_DEV = "game_dev"  # 开发商
+    GAME_PLATFORM = "game_platform"  # 平台
+    GAME_DATE = "game_date"  # 发行日期
 
 
 class MediaXpathParam(Enum):

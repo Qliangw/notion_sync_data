@@ -47,7 +47,6 @@ def get_monitoring_and_update(instance,
     page_monitoring_number = 0
     page_jump_number = 0
 
-    # page_err_number = 0
     while True:
         page_number = int(start_number / 15 + 1)
         # 获取html
@@ -62,7 +61,6 @@ def get_monitoring_and_update(instance,
         # 获取全部url TODO 获取标记时间->主要针对书籍
         url_dict = info_instance.get_url_dict(monitoring_day=monitoring_day, media_type=media_type)
         url_list = url_dict["url_list"]
-        # url_list = ["https://www.douban.com/game/26791492/"]
         log_detail.debug(f"【RUN】- 获取本页所有{media_type}的链接")
 
         # 记录for循环次数，即解析url的次数
@@ -193,7 +191,6 @@ def get_monitoring_and_update(instance,
                 else:
                     log_detail.warn(f"【RUN】- 访问该页面出现问题，媒体链接：{url}")
                     parser_err_url_list.append(url)
-                    continue
             else:
                 # 随机休眠0-1秒钟，访问notion（应该可以不用延迟，还没有细看notion接口）
                 time_number = random.random()
@@ -201,13 +198,6 @@ def get_monitoring_and_update(instance,
 
                 jump_number += 1
                 log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
-
-                # # 如果存在，对比标记状态是否改变 TODO 更新notion数据库
-                # if notion_media_status != now_status:
-                #     log_detail.warn("【RUN】豆瓣标记状态已经改变,notion状态同步功能暂不支持！")
-                # else:
-                #     jump_number += 1
-                #     log_detail.info(f"【RUN】notion中含有本条数据，已跳过！媒体链接：{url}")
 
         log_detail.info(f"【RUN】完成第{page_number}页媒体数据库的导入！")
         log_detail.info(f"【RUN】 - 第{page_number}页监控数据个数：{monitoring_info[0]}")
@@ -217,8 +207,6 @@ def get_monitoring_and_update(instance,
         page_monitoring_number += int(monitoring_info[0])
         page_jump_number += int(jump_number)
         jump_number = 0
-
-        # page_err_number += int(len(err_url))
 
         log_detail.info("--------------------------------------------------")
         if monitoring_info[1] is False:
@@ -279,10 +267,8 @@ def start_sync(media_type, media_status):
     auto_config = get_auto_config()
     database_id = ''
     if media_type == MediaType.BOOK.value:
-        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_BOOK.value]
         database_id = auto_config[ConfigName.NOTION_BOOK.value]
     elif media_type == MediaType.MUSIC.value:
-        # database_id = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_MUSIC.value]
         database_id = auto_config[ConfigName.NOTION_MUSIC.value]
     elif media_type == MediaType.MOVIE.value:
         database_id = auto_config[ConfigName.NOTION_MOVIE.value]
