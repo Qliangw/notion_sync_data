@@ -60,9 +60,9 @@ def get_monitoring_and_update(instance,
         # 创建一个解析实例
         info_instance = ParserHtmlText(html_text)
         # 获取全部url TODO 获取标记时间->主要针对书籍
-        url_dict = info_instance.get_url_dict(monitoring_day=monitoring_day)
+        url_dict = info_instance.get_url_dict(monitoring_day=monitoring_day, media_type=media_type)
         url_list = url_dict["url_list"]
-        # url_list = ["https://movie.douban.com/subject/26647087/"]
+        # url_list = ["https://www.douban.com/game/26791492/"]
         log_detail.debug(f"【RUN】- 获取本页所有{media_type}的链接")
 
         # 记录for循环次数，即解析url的次数
@@ -88,12 +88,18 @@ def get_monitoring_and_update(instance,
 
             # 当前媒体标记状态
             now_status = ""
-            if media_status == MediaStatus.WISH.value:
+            if media_status == MediaStatus.WISH.value and media_type != MediaType.GAME.value:
                 now_status = "想看"
-            elif media_status == MediaStatus.DO.value:
+            elif media_status == MediaStatus.DO.value and media_type != MediaType.GAME.value:
                 now_status = "在看"
-            elif media_status == MediaStatus.COLLECT.value:
+            elif media_status == MediaStatus.COLLECT.value and media_type != MediaType.GAME.value:
                 now_status = "看过"
+            elif media_status == MediaStatus.WISH.value and media_type == MediaType.GAME.value:
+                now_status = "想玩"
+            elif media_status == MediaStatus.DO.value and media_type == MediaType.GAME.value:
+                now_status = "在玩"
+            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.GAME.value:
+                now_status = "玩过"
 
             # 查询数据库中是否存在该媒体，通过检索url唯一值
             notion_media_status, old_data_json = get_notion_media_status(token=token,
@@ -280,6 +286,8 @@ def start_sync(media_type, media_status):
         database_id = auto_config[ConfigName.NOTION_MUSIC.value]
     elif media_type == MediaType.MOVIE.value:
         database_id = auto_config[ConfigName.NOTION_MOVIE.value]
+    elif media_type == MediaType.GAME.value:
+        database_id = auto_config[ConfigName.NOTION_GAME.value]
     x_database_id = get_desensitization_of_user_info(database_id)
     log_detail.info(f"【RUN】- 取得notion的database_id：{x_database_id}")
 
@@ -319,9 +327,10 @@ def init_database():
     init_simple_database(config_dict=auto_config, media_type=MediaType.BOOK.value, token=token, page_id=page_id)
     init_simple_database(config_dict=auto_config, media_type=MediaType.MOVIE.value, token=token, page_id=page_id)
     init_simple_database(config_dict=auto_config, media_type=MediaType.MUSIC.value, token=token, page_id=page_id)
+    init_simple_database(config_dict=auto_config, media_type=MediaType.GAME.value, token=token, page_id=page_id)
     log_detail.info("【RUN】数据库初始化完成。")
     log_detail.info(
-        "【Tip】已在notion页面创建数据库，请输入<python run.py -m [book/music/movie] -s [wish/do/collect/all]>完成媒体的导入")
+        "【Tip】已在notion页面创建数据库，请输入<python run.py -m [book/music/movie/game] -s [wish/do/collect/all]>完成媒体的导入")
 
 
 def init_simple_database(config_dict, media_type, token, page_id):

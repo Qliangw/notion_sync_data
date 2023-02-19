@@ -17,7 +17,7 @@ def get_version():
 arg_parser = argparse.ArgumentParser(description="导入数据至notion数据库")
 arg_parser.add_argument('-m',
                         '--media',
-                        help='输入模式，book/movie/music')
+                        help='输入模式，book/movie/music/game')
 arg_parser.add_argument('-s',
                         '--status',
                         help='输入媒体状态，wish/do/collect/all')
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     status = args.status
     func = args.func
 
-    if media in ['book', 'music', 'movie'] and status in ['do', 'wish', 'collect', 'all']:
+    if media in ['book', 'music', 'movie', 'game'] and status in ['do', 'wish', 'collect', 'all']:
         if func is not None:
             log_detail.warn("【Tip】参数过多，不做处理，退出程序")
             exit()

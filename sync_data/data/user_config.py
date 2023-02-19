@@ -19,6 +19,7 @@ class ConfigName(Enum):
     NOTION_BOOK = 'book_database_id'
     NOTION_MUSIC = 'music_database_id'
     NOTION_MOVIE = 'movie_database_id'
+    NOTION_GAME = 'game_database_id'
 
 
 class UserConfig(object):

@@ -4,6 +4,7 @@
 # @Function: 使用bs4查找html相关数据
 import datetime
 import re
+
 from bs4 import BeautifulSoup
 
 from sync_data.tool.douban.data.enum_data import MediaType, MediaInfo
@@ -22,7 +23,7 @@ class ParserHtmlText:
         self.html = html_text
         self.soup = BeautifulSoup(self.html, 'html.parser')
 
-    def get_url_dict(self, monitoring_day=0):
+    def get_url_dict(self, monitoring_day=0, media_type=MediaType.BOOK):
         """
         解析个人wish/do/collect内容的每个url
 
@@ -34,9 +35,15 @@ class ParserHtmlText:
         monitoring_info = [0, continue_request]
         url_dict = {}
         try:
-            info = self.soup.select('.nbg')
-            for url in info:
-                url_list.append(url.get('href'))
+            if media_type == MediaType.GAME.value:
+                info = self.soup.select('.common-item')
+                for url in info:
+                    href_ = url.select_one('.title > a')['href']
+                    url_list.append(href_)
+            else:
+                info = self.soup.select('.nbg')
+                for url in info:
+                    url_list.append(url.get('href'))
 
             if monitoring_day != 0:
                 mark_date = self.soup.select('span.date')
@@ -132,6 +139,8 @@ class ParserHtmlText:
         elif media_type == MediaType.MOVIE.value:
             # log_detail.warn("【RUN】暂不支持电影、电视剧的导入！")
             self.dict = self.__get_movie_dict()
+        elif media_type == MediaType.GAME.value:
+            self.dict = self.__get_game_dict()
         else:
             pass
 
@@ -328,6 +337,71 @@ class ParserHtmlText:
         movie_dict[MediaInfo.RELEASE_DATE.value] = year
         return movie_dict
 
+    def __get_game_dict(self):
+        log_detail.debug(f"【RUN】- 解析游戏信息")
+        game_dict = {}
+
+        # 游戏名称
+        title = self.soup.select('#content > h1')[0].text.strip()
+        log_detail.debug(f"【RUN】- 游戏名称：{title}")
+        game_type = []
+        game_platform = []
+        game_attrs = self.soup.select('dl.game-attr dd')
+
+        # 游戏类型
+        tmp_game_types = game_attrs[0].select('a')
+        for tmp_type in tmp_game_types:
+            game_type.append(tmp_type.text.strip())
+        log_detail.debug(f"【RUN】- 游戏类型：{game_type}")
+
+        # 游戏平台
+        tmp_game_platforms = game_attrs[1].select('a')
+        for platform in tmp_game_platforms:
+            game_platform.append(platform.text.strip())
+        log_detail.debug(f"【RUN】- 游戏平台：{game_platform}")
+
+        # 开发商
+        try:
+            developer = self.soup.select_one("dt:contains('开发商:') + dd").text.strip().replace(',', '，')
+        except Exception:
+            developer = ""
+        log_detail.debug(f"【RUN】- developer: {developer}")
+
+        # 发行商
+        try:
+            publisher = self.soup.select_one("dt:contains('发行商:') + dd").text.strip().replace(',', '，')
+        except Exception:
+            publisher = ""
+        log_detail.debug(f"【RUN】- publisher: {publisher}")
+
+        # 发行日期
+        try:
+            release_date = self.soup.select_one("dt:contains('发行日期:') + dd").text.strip()
+        except Exception:
+            release_date = ""
+        log_detail.debug(f"【RUN】- release_date: {release_date}")
+
+        # 评分 评价数 图片网址
+        rating_list = get_media_rating_list(self.soup)
+        log_detail.debug(f"【RUN】- rating_list: {rating_list}")
+        game_img = self.soup.select("div.pic > a > img")[0].attrs['src']
+        log_detail.debug(f"【RUN】- game_img: {game_img}")
+        my_comment, my_date, my_rating = self.get_my_game_rating()
+        game_dict[MediaInfo.TITLE.value] = title
+        game_dict[MediaInfo.GAME_TYPE.value] = game_type
+        game_dict[MediaInfo.GAME_PLATFORM.value] = game_platform
+        game_dict[MediaInfo.GAME_DEV.value] = developer
+        game_dict[MediaInfo.GAME_PUB.value] = publisher
+        game_dict[MediaInfo.GAME_DATE.value] = release_date
+        game_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
+        game_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
+        game_dict[MediaInfo.IMG.value] = game_img
+        game_dict[MediaInfo.MY_DATE.value] = my_date
+        game_dict[MediaInfo.MY_RATING.value] = my_rating
+        game_dict[MediaInfo.MY_COMMENT.value] = my_comment
+
+        return game_dict
+
     def get_my_movie_rating(self):
         try:
             # data = self.soup.select("#interest_sect_level > div.j.a_stars")
@@ -375,9 +449,30 @@ class ParserHtmlText:
             log_detail.error(f"【ERROR】- {e}")
             my_comment = ''
         return my_comment, my_date, my_rating
+
     # def get_music(self):
     #     infos = self.__get_music_dict()
     #     return infos
+    def get_my_game_rating(self):
+        try:
+            my_date = self.soup.select_one("span.color_gray").text.strip()
+            log_detail.debug(f"【RUN】- my_date: {my_date}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_date = ''
+        try:
+            my_rating = self.soup.select_one("#n_rating").get('value')
+            log_detail.debug(f"【RUN】- my_rating: {my_rating}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_rating = ''
+        try:
+            my_comment = self.soup.select_one("div.collection-comment").text.strip()
+            log_detail.debug(f"【RUN】- my_comment: {my_comment}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_comment = ''
+        return my_comment, my_date, my_rating
 
 
 def get_single_info_str(str_list, str_key):

@@ -65,14 +65,20 @@ class DouBanBase:
 
         :param url: 1. 如果为空，则默认配置一个链接，该链接为豆瓣用户的【想看（wish）】页面 | 2. url必须为某个书、影、音的详情页
         :param user_id: 用户id(如果url选择第二种则为空）
-        :param media_type: 媒体类别（book/movie/music），可以通过../tool/douban/data/enum_data中的类获取。
+        :param media_type: 媒体类别（book/movie/music/game），可以通过../tool/douban/data/enum_data中的类获取。
         :param media_status: 状态（wish/do/collect），同上
         :param start_number: url为空时，该参数必填
         :return: html的text格式
         """
 
         # TODO 增加参数的判断，以及一些异常的处理
-        if url is None:
+        if url is None and media_type == 'game':
+            url = f"https://www.douban.com/people/{user_id}/games?action={media_status}&start={start_number}"
+            self.req = RequestUtils(request_interval_mode=True)
+            res = self.req.get_res("https://www.douban.com/", headers=self.headers)
+            cookies = res.cookies
+            cookies = requests.utils.dict_from_cookiejar(cookies)
+        elif url is None and media_type == 'game':
             url = f"https://{media_type}.douban.com/people/{user_id}/{media_status}?start={start_number}&sort=time&rating=all&filter=all&mode=grid"
             self.req = RequestUtils(request_interval_mode=True)
             res = self.req.get_res("https://www.douban.com/", headers=self.headers)

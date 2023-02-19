@@ -8,6 +8,7 @@ import os
 import threading
 
 import yaml
+
 from sync_data.utils import log_detail
 
 # 抄作业 https://github.com/jxxghp/nas-tools/blob/master/config.py
@@ -97,7 +98,7 @@ def auto_config_database(media_type, database_id):
     """
 
     try:
-        if media_type in ['book', 'music', 'movie'] and len(database_id) == 32:
+        if media_type in ['book', 'music', 'movie', 'game'] and len(database_id) == 32:
             auto_conf = get_auto_config()
             auto_conf_path = get_auto_conf_path()
             auto_conf[f'{media_type}_database_id'] = database_id
@@ -123,6 +124,7 @@ def save_auto_config(new_config):
         log_detail.error(f"【RUN】自动保存配置失败：{err}")
         return "failed"
 
+
 def get_auto_conf_path():
     base_path = Config().get_config_path()
     auto_conf_path = base_path.replace('config', 'auto')
@@ -137,7 +139,9 @@ def get_auto_config():
         log_detail.info("【RUN】自动配置文件不存在，将会自动创建auto.yaml文件")
         auto_config = {"book_database_id": "",
                        "music_database_id": "",
-                       "movie_database_id": ""}
+                       "movie_database_id": "",
+                       "game_database_id": ""
+                       }
         with open(auto_conf_path, mode='w', encoding='utf-8') as file:
             yaml.dump(auto_config, file, allow_unicode=True)
         return auto_config

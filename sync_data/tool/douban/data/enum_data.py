@@ -14,6 +14,7 @@ class MediaType(Enum):
     BOOK = "book"
     MOVIE = "movie"
     MUSIC = "music"
+    GAME = "game"
 
 
 class MediaStatus(Enum):
@@ -71,6 +72,13 @@ class MediaInfo(Enum):
     LANGUAGE = "language"
     CATEGORIES = "Categories"
     IMDB = "IMDb"
+
+    # 游戏
+    GAME_TYPE = "game_type"
+    GAME_PUB = "game_pub"
+    GAME_DEV = "game_dev"
+    GAME_PLATFORM = "game_platform"
+    GAME_DATE = "game_date"
 
 
 class MediaXpathParam(Enum):
