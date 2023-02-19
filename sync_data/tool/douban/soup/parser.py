@@ -4,10 +4,11 @@
 # @Function: 使用bs4查找html相关数据
 import datetime
 import re
-
 from bs4 import BeautifulSoup
+
 from sync_data.tool.douban.data.enum_data import MediaType, MediaInfo
 from sync_data.utils import log_detail
+
 
 # 解析参考 https://zhuanlan.zhihu.com/p/54195299
 
@@ -16,6 +17,7 @@ class ParserHtmlText:
     """
     使用BeautifulSoup解析html
     """
+
     def __init__(self, html_text):
         self.html = html_text
         self.soup = BeautifulSoup(self.html, 'html.parser')
@@ -58,7 +60,7 @@ class ParserHtmlText:
                 for key in mark_date_dict:
                     mark_date_i = datetime.datetime.strptime(mark_date_dict.get(key), '%Y-%m-%d')
                     interval = today - mark_date_i
-                    if interval.days <  monitoring_day:
+                    if interval.days < monitoring_day:
                         log_detail.debug(f'【RUN】-- 第{count_num}个的{key}数据{mark_date_i}与当天相差{interval}天')
                         count_num += 1
                     else:
@@ -72,7 +74,7 @@ class ParserHtmlText:
                 count_num = len(url_list)
 
             # 如果该页媒体为15，且监控没有限制或者都在监控日期内，则继续获取下一页内容
-            if len(url_list) == 15 and count_num == len(url_list):
+            if (len(url_list) == 15 or len(url_list) == 14) and count_num == len(url_list):
                 continue_request = True
                 # record_key = count_num
             else:
@@ -172,6 +174,7 @@ class ParserHtmlText:
         # 评分 评价数 图片网址
         rating_list = get_media_rating_list(self.soup)
         book_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
+        my_comment, my_date, my_rating = self.get_my_book_rating()
 
         # 价格
         book_price_list = [float(s) for s in re.findall(r'-?\d+\.?\d*', book_price)]
@@ -196,6 +199,9 @@ class ParserHtmlText:
         book_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         book_dict[MediaInfo.IMG.value] = book_img
         book_dict[MediaInfo.RELATED.value] = related_infos
+        book_dict[MediaInfo.MY_DATE.value] = my_date
+        book_dict[MediaInfo.MY_RATING.value] = my_rating
+        book_dict[MediaInfo.MY_COMMENT.value] = my_comment
         return book_dict
 
     def __get_music_dict(self):
@@ -229,7 +235,6 @@ class ParserHtmlText:
         music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
         music_isrc = get_single_info_str(str_list=infos, str_key="条形码:")
 
-
         # 评分 评价数 图片url
         rating_list = get_media_rating_list(self.soup)
         music_img = self.soup.select("#mainpic > span > a > img")[0].attrs['src']
@@ -246,7 +251,6 @@ class ParserHtmlText:
         music_dict[MediaInfo.IMG.value] = music_img
         return music_dict
 
-
     def __get_movie_dict(self):
         log_detail.debug("【RUN】- 解析影视信息")
         # 标签名不加任何修饰，类名前加点，id名前加#
@@ -260,6 +264,9 @@ class ParserHtmlText:
         titles = [i.strip() for i in titles if i.strip() != '']
         movie_title = ''.join(titles)
 
+        # 上映时间
+        year = self.soup.select_one('#wrapper > div > h1 > span:last-of-type').text.strip('()')
+        log_detail.debug("【RUN】- 上映时间：%s" % year)
         # 导演
         if '导演' in infos:
             movie_director = get_multiple_infos_list(infos, '导演', 2)
@@ -293,6 +300,7 @@ class ParserHtmlText:
 
         # 评分 评价数
         rating_list = get_media_rating_list(self.soup)
+        my_comment, my_date, my_rating = self.get_my_movie_rating()
 
         # 图片网址
         movie_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
@@ -300,7 +308,6 @@ class ParserHtmlText:
         # 简介
         related_info = self.soup.select("#content > div > div.article > div > div.indent > span")
         related_infos = get_media_related_infos(related_info)
-
 
         movie_dict[MediaInfo.TITLE.value] = movie_title
         movie_dict[MediaInfo.DIRECTOR.value] = movie_director
@@ -315,14 +322,67 @@ class ParserHtmlText:
         movie_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         movie_dict[MediaInfo.IMG.value] = movie_img
         movie_dict[MediaInfo.RELATED.value] = related_infos
+        movie_dict[MediaInfo.MY_DATE.value] = my_date
+        movie_dict[MediaInfo.MY_RATING.value] = my_rating
+        movie_dict[MediaInfo.MY_COMMENT.value] = my_comment
+        movie_dict[MediaInfo.RELEASE_DATE.value] = year
         return movie_dict
 
+    def get_my_movie_rating(self):
+        try:
+            # data = self.soup.select("#interest_sect_level > div.j.a_stars")
+            # log_detail.debug(f"【RUN】- data: {data}")
+            my_date = self.soup.select("#interest_sect_level > div.j.a_stars > span > span")[0].contents[0]
+            log_detail.debug(f"【RUN】- my_date: {my_date}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_date = ''
+        try:
+            my_rating = self.soup.select_one("#n_rating").get('value')
+            log_detail.debug(f"【RUN】- my_rating: {my_rating}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_rating = ''
+        try:
+            my_comment = self.soup.select_one(
+                "#interest_sect_level > div.j.a_stars > span:last-of-type").contents[0].strip()
+            log_detail.debug(f"【RUN】- my_comment: {my_comment}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_comment = ''
+        return my_comment, my_date, my_rating
+
+    def get_my_book_rating(self):
+        try:
+            # data = self.soup.select("#interest_sect_level > div.j.a_stars")
+            # log_detail.debug(f"【RUN】- data: {data}")
+            my_date = self.soup.select("#interest_sect_level > div.j.a_stars > span")[1].contents[0]
+            log_detail.debug(f"【RUN】- my_date: {my_date}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_date = ''
+        try:
+            my_rating = self.soup.select_one("#n_rating").get('value')
+            log_detail.debug(f"【RUN】- my_rating: {my_rating}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_rating = ''
+        try:
+            my_comment = self.soup.select_one(
+                "#interest_sect_level > div.j.a_stars > br > span:last-of-type").text.strip()
+            log_detail.debug(f"【RUN】- my_comment: {my_comment}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_comment = ''
+        return my_comment, my_date, my_rating
     # def get_music(self):
     #     infos = self.__get_music_dict()
     #     return infos
 
+
 def get_single_info_str(str_list, str_key):
     return str_list[str_list.index(str_key) + 1] if str_key in str_list else ""
+
 
 def get_single_info_list(infos_list, str_key):
     """
@@ -346,6 +406,7 @@ def get_single_info_list(infos_list, str_key):
     except Exception as err:
         log_detail.error(f"【RUN】- 未解析到<{str_key}>信息:{err}")
         return str_list
+
 
 def get_multiple_infos_list(infos_list, str_key, next_number):
     """
@@ -374,7 +435,8 @@ def get_multiple_infos_list(infos_list, str_key, next_number):
         return str_list
     except Exception as err:
         log_detail.error(f"【RUN】未解析到{str_key}数据：{err}")
-        return  str_list
+        return str_list
+
 
 def get_media_rating_list(soup):
     """
@@ -398,6 +460,7 @@ def get_media_rating_list(soup):
     except Exception as err:
         log_detail.warn(f"【RUN】未解析到评价数据{err}")
         return rating_list
+
 
 def get_media_related_infos(info):
     """

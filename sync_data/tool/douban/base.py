@@ -5,12 +5,13 @@
 
 import requests.utils
 
-from sync_data.utils.http_utils import RequestUtils
 from sync_data.utils import log_detail
+from sync_data.utils.http_utils import RequestUtils
 
 
 class DouBanBase:
-    __headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"}
+    __headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"}
 
     def __init__(self, user_agent=None, user_cookies=None):
         """
@@ -73,16 +74,23 @@ class DouBanBase:
         # TODO 增加参数的判断，以及一些异常的处理
         if url is None:
             url = f"https://{media_type}.douban.com/people/{user_id}/{media_status}?start={start_number}&sort=time&rating=all&filter=all&mode=grid"
+            self.req = RequestUtils(request_interval_mode=True)
+            res = self.req.get_res("https://www.douban.com/", headers=self.headers)
+            cookies = res.cookies
+            cookies = requests.utils.dict_from_cookiejar(cookies)
+        else:
+            cookies = self.__get_cookies()
+
+        log_detail.debug(f"【RUN】配置默认url：{url}")
 
         headers = self.__get_headers()
         log_detail.debug(f"【RUN】获取headers：{headers}")
-
-        cookies = self.__get_cookies()
         log_detail.debug(f"【RUN】获取cookies{cookies}")
 
         try:
             res = self.req.get_res(url=url, headers=headers, cookies=cookies)
             log_detail.info("【RUN】请求url，获取返回值")
+            log_detail.debug(f"【RUN】返回值：{res}")
 
             if res.status_code == 200:
                 res_text = res.text
