@@ -3,3 +3,5 @@ beautifulsoup4~=4.10.0
 requests~=2.27.1
 urllib3~=1.26.8
 PyYAML~=6.0
+ruamel.yaml==0.17.21
+ruamel.yaml.clib==0.2.7
