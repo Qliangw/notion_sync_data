@@ -6,6 +6,7 @@
 import requests.utils
 
 from sync_data.utils import log_detail
+from sync_data.utils.config import Config
 from sync_data.utils.http_utils import RequestUtils
 
 
@@ -31,7 +32,7 @@ class DouBanBase:
 
         # cookies为空，先访问一次首页
         if user_cookies is None:
-            log_detail.debug("【RUN】访问豆瓣主页，配置默认cookie")
+            log_detail.info("【RUN】访问豆瓣主页，配置默认cookie")
             try:
                 self.req = RequestUtils(request_interval_mode=True)
                 res = self.req.get_res("https://www.douban.com/", headers=self.headers)
@@ -40,17 +41,16 @@ class DouBanBase:
                 self.cookie = cookie
             except Exception as err:
                 log_detail.error(f"【RUN】获取cookie失败:{format(err)}")
-
         else:
             self.req = RequestUtils(request_interval_mode=True)
             cookies = user_cookies
             cookie_dict = requests.utils.dict_from_cookiejar(requests.utils.cookiejar_from_dict({'Cookie': cookies}))
             self.cookie = cookie_dict
-            log_detail.debug(f"【RUN】配置用户自定义cookie：{user_cookies}")
+            log_detail.info(f"【DouBan】配置用户自定义cookie，重要用户信息已隐藏")
 
     def __set_cookies(self, res):
         if res.cookies.values() is None:
-            log_detail.debug(f"【RUN】配置默认cookie：{res.cookies}")
+            log_detail.info(f"【DouBan】配置默认cookie：{res.cookies}")
             self.cookies = res.cookies.values()
 
     def __get_cookies(self):
