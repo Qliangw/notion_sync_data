@@ -14,7 +14,7 @@
 
 
 
-**最新版本：**[v0.1.2-beta](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.2-beta)
+**最新版本：**[v0.1.2](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.2)
 
 ## 功能
 

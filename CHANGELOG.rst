@@ -13,7 +13,7 @@
 
 [Unreleased]
 ============
-`[v0.1.2-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.2-alpha...v0.1.2-beta>`_ - 2023-02-20
+`[v0.1.2] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.2-beta...v0.1.2>`_ - 2023-02-20
 ========================
 - fix: 修复导入某些项目失败的问题 `[pr#20] <https://github.com/Qliangw/notion_sync_data/pull/20>`_
 - feat: 新增游戏库的支持
@@ -21,6 +21,9 @@
 
 .. tip::
     - 更新后请先运行 python run.py -f config
+
+`[v0.1.2-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.2-alpha...v0.1.2-beta>`_ - 2023-02-20
+========================
 
 `[v0.1.2-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1...v0.1.2-alpha>`_ - 2022-08-23
 ========================
