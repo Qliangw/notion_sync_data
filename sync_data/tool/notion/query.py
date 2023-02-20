@@ -4,7 +4,6 @@
 # @Function:
 
 
-import requests
 import json
 
 from sync_data.tool.notion.base import NotionBaseInfo
@@ -25,12 +24,12 @@ def query_db_data(token, database_id, media_url):
     api_url = base.get_db_url()
     api_url = f"{api_url}/{database_id}/query"
     params = json.dumps({
-      "filter": {
-        "property": "豆瓣链接",
-        "url": {
-          "equals": f"{media_url}"
+        "filter": {
+            "property": "豆瓣链接",
+            "url": {
+                "equals": f"{media_url}"
+            }
         }
-      }
     })
     headers = base.get_headers()
     req = RequestUtils()
@@ -50,8 +49,8 @@ def get_notion_media_status(token, database_id, media_url):
     data_json = query_db_data(token=token, database_id=database_id, media_url=media_url)
     # print(data_json['results'])
     if not data_json['results']:
-        return "不存在"
+        return "不存在", data_json
     else:
         notion_media_status = data_json['results'][0]['properties']['标记状态']['select']['name']
         log_detail.debug(f"【RUN】- 数据库中的状态为：{notion_media_status}")
-        return notion_media_status
+        return notion_media_status, data_json

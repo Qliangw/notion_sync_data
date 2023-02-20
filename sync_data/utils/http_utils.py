@@ -5,9 +5,8 @@
 
 import datetime
 import random
-import time
-
 import requests
+import time
 import urllib3
 
 
@@ -64,12 +63,33 @@ class RequestUtils:
             except requests.exceptions.RequestException:
                 i += 1
 
+    def patch(self, url, params, headers={}, json={}):
+        """
+        patch 请求
+
+        :param url:
+        :param params:
+        :param headers:
+        :param json:
+        :return:
+        """
+        i = 0
+        while i < 3:
+            try:
+                self.check_request()
+                r = requests.patch(url, data=params,
+                                   verify=False, headers=headers, json=json)
+                # return str(r.content, 'UTF-8')
+                return r
+            except requests.exceptions.RequestException:
+                i += 1
+
     def get(self, url, params=None, headers=None):
         i = 0
         while i < 3:
             try:
                 self.check_request()
-                r = requests.get(url, verify=False, headers=headers, params=params)
+                r = requests.get(url, verify=False, headers=headers, params=params, timeout=30)
                 return str(r.content, 'UTF-8')
             except requests.exceptions.RequestException:
                 i += 1
