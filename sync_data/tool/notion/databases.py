@@ -4,15 +4,14 @@
 # @Function: notion 数据库处理
 
 import json
-import re
-
-import requests
+from datetime import datetime
 
 from sync_data.tool.douban.data.enum_data import MediaInfo, MediaStatus, MediaType
+from sync_data.tool.notion import base
 from sync_data.tool.notion.data.enum_data import DatabaseProperty
 from sync_data.utils import log_detail
-from sync_data.tool.notion import base
 from sync_data.utils.http_utils import RequestUtils
+
 
 def get_multi_select_body(data_list):
     str_key = '{"name": "xxx"}'
@@ -22,7 +21,8 @@ def get_multi_select_body(data_list):
         new_list_tmp.append(new_tmp)
     # print(new_list_tmp)
     str_new = ','.join(new_list_tmp)
-    return  "[" + str_new + "]"
+    return "[" + str_new + "]"
+
 
 def get_non_null_params_body(property_type, property_params):
     """
@@ -45,9 +45,17 @@ def get_non_null_params_body(property_type, property_params):
             tmp_dict.update(name=property_params)
             body_dict.update(select=tmp_dict)
             # body_dict["select"].update(name=property_params)
+        elif property_type == DatabaseProperty.DATE.value:
+            date_obj = datetime.strptime(property_params, '%Y-%m-%d')
+            iso_date_str = date_obj.date().isoformat()
+            log_detail.debug(f"【RUN】- {property_params}转换为{iso_date_str}")
+            tmp_dict = {}
+            tmp_dict.update(start=iso_date_str)
+            body_dict.update(date=tmp_dict)
         return body_dict
     else:
         return body_dict
+
 
 def get_body(data_dict, database_id, media_status, media_type):
     """
@@ -59,20 +67,7 @@ def get_body(data_dict, database_id, media_status, media_type):
     :param database_id:
     :return:
     """
-    status = ""
-    music_status = ""
-    if media_status == MediaStatus.WISH.value:
-        status = "想看"
-        music_status = "想听"
-    elif media_status == MediaStatus.DO.value:
-        status = "在看"
-        music_status = "在听"
-    elif media_status == MediaStatus.COLLECT.value:
-        status = "看过"
-        music_status = "听过"
-    else:
-        status = ""
-        music_status = ""
+    music_status, status, game_status = get_media_status(media_status)
 
     log_detail.info(f"【RUN】- {media_type}数据信息整理为json格式")
     rating = data_dict[MediaInfo.RATING_F.value]
@@ -223,6 +218,14 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "豆瓣链接": {
                     "url": f"{data_dict[MediaInfo.URL.value]}"
+                },
+                "短评": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.MY_COMMENT.value]
+                        }
+                    }]
                 }
             }
         }
@@ -239,6 +242,22 @@ def get_body(data_dict, database_id, media_status, media_type):
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
                                                 property_params=data_dict[MediaInfo.ASSESS.value])
             body["properties"]["评分人数"] = tmp_dict
+
+        # 标记日期
+        if data_dict[MediaInfo.MY_DATE.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
+                                                property_params=data_dict[MediaInfo.MY_DATE.value])
+            body["properties"]["标记时间"] = tmp_dict
+
+        # 个人评分
+        if data_dict[MediaInfo.MY_RATING.value]:
+            tmp_dict = get_my_rate(data_dict)
+            body["properties"]["个人评分"] = tmp_dict
+        # 出版年份
+        if data_dict[MediaInfo.RELEASE_DATE.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
+                                                property_params=data_dict[MediaInfo.RELEASE_DATE.value][0:4])
+            body["properties"]["时间"] = tmp_dict
         return body
     elif media_type == MediaType.BOOK.value:
         body = {
@@ -251,7 +270,9 @@ def get_body(data_dict, database_id, media_status, media_type):
                     "title": [{
                         "type": "text",
                         "text": {
-                            "content": data_dict[MediaInfo.TITLE.value]
+                            "content": data_dict[
+                                           MediaInfo.TITLE.value] + f"：{data_dict[MediaInfo.SUBHEAD.value]}" if data_dict.get(
+                                MediaInfo.SUBHEAD.value) else data_dict[MediaInfo.TITLE.value]
                         }
                     }]
                 },
@@ -272,11 +293,6 @@ def get_body(data_dict, database_id, media_status, media_type):
                         }
                     }]
                 },
-                "出版年份": {
-                    "select": {
-                        "name": data_dict[MediaInfo.PUB_DATE.value][0:4]
-                    }
-                },
                 "标记状态": {
                     "select": {
                         "name": f"{status}"
@@ -284,6 +300,22 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "豆瓣链接": {
                     "url": f"{data_dict[MediaInfo.URL.value]}"
+                },
+                "短评": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.MY_COMMENT.value]
+                        }
+                    }]
+                },
+                "简介": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.RELATED.value]
+                        }
+                    }]
                 }
             }
         }
@@ -291,7 +323,7 @@ def get_body(data_dict, database_id, media_status, media_type):
         #  ISBN
         if data_dict[MediaInfo.ISBN.value]:
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.URL.value,
-                                                 property_params=data_dict[MediaInfo.ISBN.value])
+                                                property_params=data_dict[MediaInfo.ISBN.value])
             body["properties"]["ISBN"] = tmp_dict
 
         # 价格
@@ -305,20 +337,27 @@ def get_body(data_dict, database_id, media_status, media_type):
         if data_dict[MediaInfo.RATING_F.value]:
             rating_f = float(data_dict[MediaInfo.RATING_F.value])
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
-                                                   property_params=rating_f)
+                                                property_params=rating_f)
             body["properties"]["评分"] = tmp_dict
 
         # 评分人数
         if data_dict[MediaInfo.ASSESS.value]:
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
-                                                   property_params=data_dict[MediaInfo.ASSESS.value])
+                                                property_params=data_dict[MediaInfo.ASSESS.value])
             body["properties"]["评分人数"] = tmp_dict
 
         # 页数
-        if data_dict[MediaInfo.PAGES.value]:
-            pages_num = int(data_dict[MediaInfo.PAGES.value])
+        page = data_dict[MediaInfo.PAGES.value]
+        if page:
+            pages_num = 1
+            try:
+                if page.endswith("页"):
+                    page = page[:-1]
+                pages_num = round(float(page))
+            except Exception:
+                pass
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
-                                                  property_params=pages_num)
+                                                property_params=pages_num)
             body["properties"]["页数"] = tmp_dict
 
         # 出版社
@@ -326,7 +365,151 @@ def get_body(data_dict, database_id, media_status, media_type):
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
                                                 property_params=data_dict[MediaInfo.PUBLISHER.value])
             body["properties"]["出版社"] = tmp_dict
+
+        # 标记日期
+        if data_dict[MediaInfo.MY_DATE.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
+                                                property_params=data_dict[MediaInfo.MY_DATE.value])
+            body["properties"]["标记时间"] = tmp_dict
+
+        # 个人评分
+        if data_dict[MediaInfo.MY_RATING.value]:
+            tmp_dict = get_my_rate(data_dict)
+            body["properties"]["个人评分"] = tmp_dict
+
+        # 出版年份
+        if data_dict[MediaInfo.PUB_DATE.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
+                                                property_params=data_dict[MediaInfo.PUB_DATE.value][0:4])
+            body["properties"]["出版年份"] = tmp_dict
         return body
+    elif media_type == MediaType.GAME.value:
+        str_game_type = get_multi_select_body(data_dict[MediaInfo.GAME_TYPE.value])
+        json_game_type = json.loads(str_game_type)
+        str_platform = get_multi_select_body(data_dict[MediaInfo.GAME_PLATFORM.value])
+        json_platform = json.loads(str_platform)
+        body = {
+            "parent": {
+                "type": "database_id",
+                "database_id": f"{database_id}"
+            },
+            "properties": {
+                "游戏名": {
+                    "title": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.TITLE.value]
+                        }
+                    }]
+                },
+                "封面": {
+                    "files": [{
+                        "type": "external",
+                        "name": data_dict[MediaInfo.IMG.value][-13:],
+                        "external": {
+                            "url": data_dict[MediaInfo.IMG.value]
+                        }
+                    }]
+                },
+                "标记状态": {
+                    "select": {
+                        "name": f"{game_status}"
+                    }
+                },
+                "豆瓣链接": {
+                    "url": f"{data_dict[MediaInfo.URL.value]}"
+                },
+                "短评": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {
+                            "content": data_dict[MediaInfo.MY_COMMENT.value]
+                        }
+                    }]
+                },
+                "类型": {
+                    "multi_select": json_game_type
+                },
+                "平台": {
+                    "multi_select": json_platform
+                }
+
+            }
+        }
+
+        # 评分
+        if data_dict[MediaInfo.RATING_F.value]:
+            rating_f = float(data_dict[MediaInfo.RATING_F.value])
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=rating_f)
+            body["properties"]["评分"] = tmp_dict
+
+        # 评分人数
+        if data_dict[MediaInfo.ASSESS.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
+                                                property_params=data_dict[MediaInfo.ASSESS.value])
+            body["properties"]["评分人数"] = tmp_dict
+
+        # 标记日期
+        if data_dict[MediaInfo.MY_DATE.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
+                                                property_params=data_dict[MediaInfo.MY_DATE.value])
+            body["properties"]["标记时间"] = tmp_dict
+
+        # 个人评分
+        if data_dict[MediaInfo.MY_RATING.value]:
+            tmp_dict = get_my_rate(data_dict)
+            body["properties"]["个人评分"] = tmp_dict
+
+        # 发行日期
+        if data_dict[MediaInfo.GAME_DATE.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
+                                                property_params=data_dict[MediaInfo.GAME_DATE.value])
+            body["properties"]["发行日期"] = tmp_dict
+
+        # 开发商
+        if data_dict[MediaInfo.GAME_DEV.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
+                                                property_params=data_dict[MediaInfo.GAME_DEV.value])
+            body["properties"]["开发商"] = tmp_dict
+
+        # 发行商
+        if data_dict[MediaInfo.GAME_PUB.value]:
+            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
+                                                property_params=data_dict[MediaInfo.GAME_PUB.value])
+            body["properties"]["发行商"] = tmp_dict
+        return body
+
+
+def get_my_rate(data_dict):
+    body_dict = {}
+    value_num = data_dict[MediaInfo.MY_RATING.value]
+    if value_num == "1":
+        tmp_dict = {}
+        tmp_dict.update(name="⭐")
+        tmp_dict.update(color="yellow")
+        body_dict.update(select=tmp_dict)
+    elif value_num == "2":
+        tmp_dict = {}
+        tmp_dict.update(name="⭐⭐")
+        tmp_dict.update(color="yellow")
+        body_dict.update(select=tmp_dict)
+    elif value_num == "3":
+        tmp_dict = {}
+        tmp_dict.update(name="⭐⭐⭐")
+        tmp_dict.update(color="yellow")
+        body_dict.update(select=tmp_dict)
+    elif value_num == "4":
+        tmp_dict = {}
+        tmp_dict.update(name="⭐⭐⭐⭐")
+        tmp_dict.update(color="yellow")
+        body_dict.update(select=tmp_dict)
+    elif value_num == "5":
+        tmp_dict = {}
+        tmp_dict.update(name="⭐⭐⭐⭐⭐")
+        tmp_dict.update(color="yellow")
+        body_dict.update(select=tmp_dict)
+    return body_dict
 
 
 def create_database(token, page_id, media_type):
@@ -360,6 +543,7 @@ def create_database(token, page_id, media_type):
                 "类型": {"multi_select": {}},
                 "标记状态": {"select": {}},
                 "标记时间": {"date": {}},
+                "简介": {"rich_text": {}},
                 "个人评分": {"select": {"options": [
                     {"name": "⭐", "color": "yellow"},
                     {"name": "⭐⭐", "color": "yellow"},
@@ -420,8 +604,35 @@ def create_database(token, page_id, media_type):
                 "片长": {"number": {}},
                 "评分人数": {"number": {}},
                 "简介": {"rich_text": {}},
+                "短评": {"rich_text": {}},
                 "标记状态": {"select": {}},
                 "标记时间": {"date": {}},
+                "个人评分": {"select": {"options": [
+                    {"name": "⭐", "color": "yellow"},
+                    {"name": "⭐⭐", "color": "yellow"},
+                    {"name": "⭐⭐⭐", "color": "yellow"},
+                    {"name": "⭐⭐⭐⭐", "color": "yellow"},
+                    {"name": "⭐⭐⭐⭐⭐", "color": "yellow"}]}},
+            }}
+    elif media_type == MediaType.GAME.value:
+        create_db_data = {
+            "parent": {"type": "page_id", "page_id": f"{page_id}"},
+            "title": [{"type": "text", "text": {"content": "豆瓣游戏库"}}],
+            "icon": {"type": "emoji", "emoji": "🎮"},
+            "properties": {
+                "游戏名": {"title": {}},
+                "评分": {"number": {}},
+                "豆瓣链接": {"url": {}},
+                "开发商": {"select": {}},
+                "发行商": {"select": {}},
+                "类型": {"multi_select": {}},
+                "平台": {"multi_select": {}},
+                "发行日期": {"date": {}},
+                "评分人数": {"number": {}},
+                "短评": {"rich_text": {}},
+                "标记状态": {"select": {}},
+                "标记时间": {"date": {}},
+                "封面": {"files": {}},
                 "个人评分": {"select": {"options": [
                     {"name": "⭐", "color": "yellow"},
                     {"name": "⭐⭐", "color": "yellow"},
@@ -487,3 +698,106 @@ def get_flag_update_database(data_dict, database_id, token, media_status, media_
         return "exception"
 
 
+def get_flag_update_old_database(data_dict, page_id, token, media_status, media_type):
+    """
+    更新数据库
+
+    :param media_type: 媒体类型
+    :param data_dict: 待写入数据字典
+    :param page_id: 页面ID
+    :param token:【必须】
+    :param media_status: 标记状态
+    :return: TODO 返回一个成功后的页面ID
+    """
+    try:
+        body = get_new_update_body(data_dict=data_dict,
+                                   media_status=media_status,
+                                   media_type=media_type)
+        body = json.dumps(body)
+        page_data = base.NotionBaseInfo(token)
+        req = RequestUtils()
+        res = req.patch(url=page_data.get_page_url() + f"/{page_id}",
+                        headers=page_data.get_headers(),
+                        params=body)
+        if res.status_code == 200:
+            # log_detail.info(f'【RUN】- 导入《{data_dict[MediaInfo.TITLE.value]}》成功。媒体链接：{data_dict["url"]}')
+            return "succeed"
+        else:
+            log_detail.warn(f'【RUN】导入失败：{res.content}！')
+            return "failed"
+    except Exception as err:
+        log_detail.error(f'【RUN】导入异常：{err}！')
+        return "exception"
+
+
+def get_new_update_body(data_dict, media_status, media_type):
+    music_status, status, game_status = get_media_status(media_status)
+
+    log_detail.info(f"【RUN】- {media_type}数据信息整理为json格式")
+    if media_type == MediaType.MUSIC.value:
+        body = {
+            "properties": {
+                "标记状态": {
+                    "select": {
+                        "name": f"{music_status}"
+                    }
+                }
+            }
+        }
+        return body
+    elif media_type == MediaType.MOVIE.value:
+        return get_common_body(data_dict, status)
+    elif media_type == MediaType.BOOK.value:
+        return get_common_body(data_dict, status)
+    elif media_type == MediaType.GAME.value:
+        return get_common_body(data_dict, game_status)
+
+
+def get_media_status(media_status):
+    if media_status == MediaStatus.WISH.value:
+        status = "想看"
+        music_status = "想听"
+        game_status = "想玩"
+    elif media_status == MediaStatus.DO.value:
+        status = "在看"
+        music_status = "在听"
+        game_status = "在玩"
+    elif media_status == MediaStatus.COLLECT.value:
+        status = "看过"
+        music_status = "听过"
+        game_status = "玩过"
+    else:
+        status = ""
+        music_status = ""
+        game_status = ""
+    return music_status, status, game_status
+
+
+def get_common_body(data_dict, status):
+    body = {
+        "properties": {
+            "标记状态": {
+                "select": {
+                    "name": f"{status}"
+                }
+            },
+            "短评": {
+                "rich_text": [{
+                    "type": "text",
+                    "text": {
+                        "content": data_dict[MediaInfo.MY_COMMENT.value]
+                    }
+                }]
+            }
+        }
+    }
+    # 个人评分
+    if data_dict[MediaInfo.MY_RATING.value]:
+        tmp_dict = get_my_rate(data_dict)
+        body["properties"]["个人评分"] = tmp_dict
+    # 标记日期
+    if data_dict[MediaInfo.MY_DATE.value]:
+        tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
+                                            property_params=data_dict[MediaInfo.MY_DATE.value])
+        body["properties"]["标记时间"] = tmp_dict
+    return body

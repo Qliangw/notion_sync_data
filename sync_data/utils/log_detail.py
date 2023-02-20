@@ -7,7 +7,7 @@ import logging
 import os
 import threading
 from logging.handlers import TimedRotatingFileHandler
-from sync_data.utils.config import get_config, LOG_LEVEL
+from sync_data.utils.config import LOG_LEVEL, Config
 
 lock = threading.Lock()
 
@@ -18,7 +18,7 @@ class Logger:
     def __init__(self):
         self.logger = logging.Logger(__name__)
         self.logger.setLevel(level=LOG_LEVEL)
-        user_config = get_config()
+        user_config = Config().get_config()
         # self.logger.setLevel(logging.INFO)
         # log_type = user_config['app'].get('log_type', 'CONSOLE')
 

@@ -8,6 +8,7 @@ from enum import Enum
 
 class ConfigName(Enum):
     USER_AGENT = "user_agent"
+    USER_COOKIE = "cookies"
     DOUBAN = "douban"
     DOUBAN_USER_ID = 'user_id'
     DOUBAN_DAY = "day"
@@ -18,6 +19,7 @@ class ConfigName(Enum):
     NOTION_BOOK = 'book_database_id'
     NOTION_MUSIC = 'music_database_id'
     NOTION_MOVIE = 'movie_database_id'
+    NOTION_GAME = 'game_database_id'
 
 
 class UserConfig(object):
