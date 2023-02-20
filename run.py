@@ -4,7 +4,9 @@
 # @Function: 程序入口
 
 import argparse
-from sync_data.app.sync import start_sync, init_database
+import textwrap
+
+from sync_data.app.sync import start_sync, init_database, merge_old_cfg
 from sync_data.utils import log_detail
 from sync_data.version import version as ver
 
@@ -14,17 +16,33 @@ def get_version():
 
 
 # 命令行参数
-arg_parser = argparse.ArgumentParser(description="导入数据至notion数据库")
+arg_parser = argparse.ArgumentParser(description="导入数据至notion数据库",
+                                     usage='use "python %(prog)s --help" for more information',
+                                     formatter_class=argparse.RawTextHelpFormatter)
 arg_parser.add_argument('-m',
                         '--media',
-                        help='输入模式，book/movie/music/game')
+                        help=textwrap.dedent('''\
+                            输入模式
+                                book    -- 书籍
+                                    (例如：python run.py -m book -s do
+                                movie   -- 影视
+                                music   -- 音乐
+                                game    -- 游戏'''))
 arg_parser.add_argument('-s',
                         '--status',
-                        help='输入媒体状态，wish/do/collect/all')
+                        help=textwrap.dedent('''\
+                            输入媒体状态
+                                wish    -- 想看/想读/想听
+                                do      -- 在看/在读/在听
+                                collect -- 看过/度过/听过
+                                all     -- 全部'''))
 
 arg_parser.add_argument('-f',
                         '--func',
-                        help='功能参数，init --初始化数据库')
+                        help=textwrap.dedent('''\
+                            功能参数
+                                init     -- 初始化数据库
+                                config   -- 合并旧配置'''))
 
 arg_parser.add_argument('-v',
                         '--version',
@@ -58,6 +76,8 @@ if __name__ == '__main__':
         log_detail.warn(f'【Tip】您输入的-s参数为< {status} >,请输入< python run.py -h >查看正确指令')
     elif func == 'init':
         init_database()
+    elif func == "config":
+        merge_old_cfg()
     elif func is not None:
         log_detail.warn(f'【Tip】您输入的-f参数为< {func} >，请输入< python run.py -h >查看正确指令')
     else:
