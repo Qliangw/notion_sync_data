@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: create config
+        run: touch doc/config.yaml
       - name: install python 3.9
         uses: actions/setup-python@v4
         with:
