@@ -34,6 +34,8 @@ class ParserHtmlText:
         continue_request = True
         monitoring_info = [0, continue_request]
         url_dict = {}
+        mark_date_dict = {}
+
         try:
             if media_type == MediaType.GAME.value:
                 info = self.soup.select('.common-item')
@@ -49,7 +51,7 @@ class ParserHtmlText:
                 mark_date = self.soup.select('span.date')
                 # 处理所有标记时间
                 num = 0
-                mark_date_dict = {}
+
                 while num < len(mark_date):
                     mark_date_dict[num] = list(mark_date[num].strings)
                     # mark_date_dict[num] = ''.join([i.rstrip()[:-9] for i in mark_date_dict[num] if i.strip() != ''])
@@ -92,6 +94,7 @@ class ParserHtmlText:
             monitoring_info[1] = continue_request
             url_dict["url_list"] = url_list
             url_dict["monitoring_info"] = monitoring_info
+            url_dict["mark_date"] = mark_date_dict
             return url_dict
 
         except Exception as err:
@@ -183,7 +186,7 @@ class ParserHtmlText:
         # 评分 评价数 图片网址
         rating_list = get_media_rating_list(self.soup)
         book_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
-        my_comment, my_date, my_rating = self.get_my_book_rating()
+        my_comment, my_rating = self.get_my_book_rating()
 
         # 价格
         book_price_list = [float(s) for s in re.findall(r'-?\d+\.?\d*', book_price)]
@@ -208,7 +211,7 @@ class ParserHtmlText:
         book_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         book_dict[MediaInfo.IMG.value] = book_img
         book_dict[MediaInfo.RELATED.value] = related_infos
-        book_dict[MediaInfo.MY_DATE.value] = my_date
+        # book_dict[MediaInfo.MY_DATE.value] = my_date
         book_dict[MediaInfo.MY_RATING.value] = my_rating
         book_dict[MediaInfo.MY_COMMENT.value] = my_comment
         return book_dict
@@ -309,7 +312,7 @@ class ParserHtmlText:
 
         # 评分 评价数
         rating_list = get_media_rating_list(self.soup)
-        my_comment, my_date, my_rating = self.get_my_movie_rating()
+        my_comment, my_rating = self.get_my_movie_rating()
 
         # 图片网址
         movie_img = self.soup.select("#mainpic > a > img")[0].attrs['src']
@@ -404,51 +407,35 @@ class ParserHtmlText:
 
     def get_my_movie_rating(self):
         try:
-            # data = self.soup.select("#interest_sect_level > div.j.a_stars")
-            # log_detail.debug(f"【RUN】- data: {data}")
-            my_date = self.soup.select("#interest_sect_level > div.j.a_stars > span > span")[0].contents[0]
-            log_detail.debug(f"【RUN】- my_date: {my_date}")
-        except Exception as e:
-            log_detail.error(f"【ERROR】- {e}")
-            my_date = ''
-        try:
             my_rating = self.soup.select_one("#n_rating").get('value')
             log_detail.debug(f"【RUN】- my_rating: {my_rating}")
         except Exception as e:
-            log_detail.error(f"【ERROR】- {e}")
+            log_detail.warn(f"【WARN】获取个人评分失败{e}")
             my_rating = ''
         try:
             my_comment = self.soup.select_one(
                 "#interest_sect_level > div.j.a_stars > span:last-of-type").contents[0].strip()
             log_detail.debug(f"【RUN】- my_comment: {my_comment}")
         except Exception as e:
-            log_detail.error(f"【ERROR】- {e}")
+            log_detail.warn(f"【WARN】获取个人评价失败{e}")
             my_comment = ''
-        return my_comment, my_date, my_rating
+        return my_comment, my_rating
 
     def get_my_book_rating(self):
-        try:
-            # data = self.soup.select("#interest_sect_level > div.j.a_stars")
-            # log_detail.debug(f"【RUN】- data: {data}")
-            my_date = self.soup.select("#interest_sect_level > div.j.a_stars > span")[1].contents[0]
-            log_detail.debug(f"【RUN】- my_date: {my_date}")
-        except Exception as e:
-            log_detail.error(f"【ERROR】- {e}")
-            my_date = ''
         try:
             my_rating = self.soup.select_one("#n_rating").get('value')
             log_detail.debug(f"【RUN】- my_rating: {my_rating}")
         except Exception as e:
-            log_detail.error(f"【ERROR】- {e}")
+            log_detail.warn(f"【WARN】获取个人评分失败{e}")
             my_rating = ''
         try:
             my_comment = self.soup.select_one(
                 "#interest_sect_level > div.j.a_stars > br > span:last-of-type").text.strip()
             log_detail.debug(f"【RUN】- my_comment: {my_comment}")
         except Exception as e:
-            log_detail.error(f"【ERROR】- {e}")
+            log_detail.warn(f"【WARN】获取个人评价失败{e}")
             my_comment = ''
-        return my_comment, my_date, my_rating
+        return my_comment, my_rating
 
     # def get_music(self):
     #     infos = self.__get_music_dict()
