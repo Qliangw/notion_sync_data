@@ -233,20 +233,17 @@ class ParserHtmlText:
         music_performer = ''.join(map(str.strip, music_performer.split('\n')))
 
         # 流派 专辑类型 介质 发行时间 出版者 条形码
-        music_genre = infos[infos.index('流派:') + 1] if '流派:' in infos else ""
         music_genre = get_single_info_str(str_list=infos, str_key="流派:")
-        album_type = infos[infos.index('专辑类型:') + 1] if '专辑类型:' in infos else ""
         album_type = get_single_info_str(str_list=infos, str_key="专辑类型:")
-        music_medium = infos[infos.index('介质:') + 1] if '介质:' in infos else ""
         music_medium = get_single_info_str(str_list=infos, str_key="介质:")
-        music_release_date = infos[infos.index('发行时间:') + 1] if '发行时间:' in infos else ""
         music_release_date = get_single_info_str(str_list=infos, str_key="发行时间:")
-        music_isrc = infos[infos.index('条形码:') + 1] if '条形码:' in infos else ""
         music_isrc = get_single_info_str(str_list=infos, str_key="条形码:")
+        music_pub = get_single_info_str(str_list=infos, str_key="出版者:")
 
         # 评分 评价数 图片url
         rating_list = get_media_rating_list(self.soup)
         music_img = self.soup.select("#mainpic > span > a > img")[0].attrs['src']
+        my_comment, my_date, my_rating = self.get_my_music_rating()
 
         music_dict[MediaInfo.TITLE.value] = title
         music_dict[MediaInfo.PERFORMER.value] = music_performer
@@ -258,6 +255,11 @@ class ParserHtmlText:
         music_dict[MediaInfo.RATING_F.value] = float(rating_list[0])
         music_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         music_dict[MediaInfo.IMG.value] = music_img
+        music_dict[MediaInfo.MUSIC_PUB.value] = music_pub
+        music_dict[MediaInfo.MY_DATE.value] = my_date
+        music_dict[MediaInfo.MY_RATING.value] = my_rating
+        music_dict[MediaInfo.MY_COMMENT.value] = my_comment
+        music_dict[MediaInfo.ISRC.value] = music_isrc
         return music_dict
 
     def __get_movie_dict(self):
@@ -450,6 +452,29 @@ class ParserHtmlText:
             my_comment = ''
         return my_comment, my_date, my_rating
 
+    def get_my_music_rating(self):
+        try:
+            # data = self.soup.select("#interest_sect_level > div.j.a_stars")
+            # log_detail.debug(f"【RUN】- data: {data}")
+            my_date = self.soup.select("#interest_sect_level > div.j.a_stars > span")[1].contents[0]
+            log_detail.debug(f"【RUN】- my_date: {my_date}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_date = ''
+        try:
+            my_rating = self.soup.select_one("#n_rating").get('value')
+            log_detail.debug(f"【RUN】- my_rating: {my_rating}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_rating = ''
+        try:
+            my_comment = self.soup.select_one(
+                "#interest_sect_level > div.j.a_stars > br > br > span").text.strip()
+            log_detail.debug(f"【RUN】- my_comment: {my_comment}")
+        except Exception as e:
+            log_detail.error(f"【ERROR】- {e}")
+            my_comment = ''
+        return my_comment, my_date, my_rating
     # def get_music(self):
     #     infos = self.__get_music_dict()
     #     return infos
