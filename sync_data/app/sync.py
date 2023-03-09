@@ -87,18 +87,30 @@ def get_monitoring_and_update(instance,
 
             # 当前媒体标记状态
             now_status = ""
-            if media_status == MediaStatus.WISH.value and media_type != MediaType.GAME.value:
-                now_status = "想看"
-            elif media_status == MediaStatus.DO.value and media_type != MediaType.GAME.value:
-                now_status = "在看"
-            elif media_status == MediaStatus.COLLECT.value and media_type != MediaType.GAME.value:
-                now_status = "看过"
-            elif media_status == MediaStatus.WISH.value and media_type == MediaType.GAME.value:
+            if media_status == MediaStatus.WISH.value and media_type == MediaType.GAME.value:
                 now_status = "想玩"
             elif media_status == MediaStatus.DO.value and media_type == MediaType.GAME.value:
                 now_status = "在玩"
             elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.GAME.value:
                 now_status = "玩过"
+            elif media_status == MediaStatus.WISH.value and media_type == MediaType.MUSIC.value:
+                now_status = "想听"
+            elif media_status == MediaStatus.DO.value and media_type == MediaType.MUSIC.value:
+                now_status = "在听"
+            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.MUSIC.value:
+                now_status = "听过"
+            elif media_status == MediaStatus.WISH.value and media_type == MediaType.BOOK.value:
+                now_status = "想读"
+            elif media_status == MediaStatus.DO.value and media_type == MediaType.BOOK.value:
+                now_status = "在读"
+            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.BOOK.value:
+                now_status = "读过"
+            elif media_status == MediaStatus.WISH.value and media_type == MediaType.MOVIE.value:
+                now_status = "想看"
+            elif media_status == MediaStatus.DO.value and media_type == MediaType.MOVIE.value:
+                now_status = "在看"
+            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.MOVIE.value:
+                now_status = "看过"
 
             # 查询数据库中是否存在该媒体，通过检索url唯一值
             notion_media_status, old_data_json = get_notion_media_status(token=token,
