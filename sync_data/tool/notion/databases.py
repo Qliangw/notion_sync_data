@@ -286,7 +286,7 @@ def get_body(data_dict, database_id, media_status, media_type):
             body["properties"]["评分人数"] = tmp_dict
 
         # 标记日期
-        if data_dict[MediaInfo.MY_DATE.value]:
+        if data_dict[MediaInfo.MY_DATE.value] and data_dict[MediaInfo.MY_DATE.value] != "\n":
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
                                                 property_params=data_dict[MediaInfo.MY_DATE.value])
             body["properties"]["标记时间"] = tmp_dict
