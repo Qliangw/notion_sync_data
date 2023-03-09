@@ -13,8 +13,8 @@
 > 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
 
 
+**最新版本：**[v0.1.2-release](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.2-release)
 
-**最新版本：**[v0.1.2](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.2)
 
 ## 功能
 

@@ -348,7 +348,7 @@ def init_simple_database(config_dict, media_type, token, page_id):
     """
     try:
         # 配置notion数据库id
-        if config_dict['notion'][f'{media_type}_database_id'] is None:
+        if config_dict['notion'][f'{media_type}_database_id'] is None or config_dict['notion'][f'{media_type}_database_id'] == '':
             database_id = create_database(token=token, media_type=media_type, page_id=page_id)
             database_id = database_id.replace('-', '')
 
