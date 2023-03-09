@@ -13,6 +13,10 @@
 
 [Unreleased]
 ============
+`[v0.1.3-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.2-release...v0.1.3-alpha>`_ - 2023-03-10
+========================
+- fix: 修复因标记日期导入失败的问题 `[issues#22] <https://github.com/Qliangw/notion_sync_data/issues/22>`_
+
 `[v0.1.2-release] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.2-beta...v0.1.2-release>`_ - 2023-03-06
 ========================
 - fix: 修复初始化失败的问题
