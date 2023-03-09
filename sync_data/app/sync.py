@@ -122,6 +122,7 @@ def get_monitoring_and_update(instance,
                     # 添加url
                     if html_dict:
                         html_dict[MediaInfo.URL.value] = url
+                        html_dict[MediaInfo.MY_DATE.value] = url_dict['mark_date'][count_num]
                     else:
                         log_detail.warn(f"【RUN】- 解析该页面出现问题，媒体链接：{url}")
                         parser_err_url_list.append(url)
