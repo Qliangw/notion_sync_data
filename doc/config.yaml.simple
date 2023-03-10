@@ -16,7 +16,7 @@ app:
   log_server: 127.0.0.1:514
 
 # 【可选】 建议填写，以免触发触发豆瓣的反爬虫机制浏览器获取
-user_agent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
+user_agent : ''
 
 # 豆瓣参数
 douban:
@@ -24,7 +24,7 @@ douban:
   user_id: ''
 
   # 【必填】 1. 填写为0时，监控所有的  | 2. 填写非零的正整数，则监控x天内的。比如填写30，则监控一个月内的；365，则监控一年内的。
-  day: 3
+  day:
 
   # 【可选】从浏览器中获取
   # 填写后可解决某些导入失败的问题，但有被豆瓣封号的风险，请知悉

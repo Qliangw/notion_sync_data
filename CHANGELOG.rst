@@ -30,6 +30,9 @@
 .. tip::
     - 更新后请先运行 python run.py -f config
 
+`[v0.1.2-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.2-alpha...v0.1.2-beta>`_ - 2023-02-20
+========================
+
 `[v0.1.2-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.1...v0.1.2-alpha>`_ - 2022-08-23
 ========================
 - fix: 修初始化数据库失败的问题 `[issues#18] <https://github.com/Qliangw/notion_sync_data/issues/18>`_
