@@ -22,6 +22,7 @@
 - [x] 创建notion数据库
 - [x] 插入notion库
 - [x] 已添加的不再重复添加（根据豆瓣链接判断）
+- [x] Github Actions自动同步
 
 **TODO**
 

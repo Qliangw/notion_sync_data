@@ -1,0 +1,39 @@
+name: sync_douban
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  USER_AGENT: ${{ secrets.USER_AGENT }}
+  USER_COOKIE: ${{ secrets.USER_COOKIE }}
+  DOUBAN_USER_ID: ${{ secrets.DOUBAN_USER_ID }}
+  DOUBAN_DAY: ${{ secrets.DOUBAN_DAY }}
+  NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+  NOTION_BOOKS_DB: ${{ secrets.NOTION_BOOKS_DB }}
+  NOTION_MUSIC_DB: ${{ secrets.NOTION_MUSIC_DB }}
+  NOTION_MOVIE_DB: ${{ secrets.NOTION_MOVIE_DB }}
+  NOTION_GAME_DB: ${{ secrets.NOTION_GAME_DB }}
+
+jobs:
+  sync_douban:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: create config
+        run: cp doc/config.yaml.simple doc/config.yaml
+      - name: install python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - name: install python requirements
+        run: pip install -r requirements.txt
+      - name: sync douban
+        if: env.USER_AGENT != null && env.DOUBAN_USER_ID != null && env.DOUBAN_DAY != null && env.NOTION_TOKEN != null && env.NOTION_BOOKS_DB != null && env.NOTION_MUSIC_DB != null && env.NOTION_MOVIE_DB != null && env.NOTION_GAME_DB != null
+        run: |
+          python3 run.py -m music -s all
+          python3 run.py -m book -s all
+          python3 run.py -m movie -s all
+          python3 run.py -m game -s all
