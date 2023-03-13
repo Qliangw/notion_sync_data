@@ -2,6 +2,9 @@
 name: Build Notion Sync Tools
 
 on:
+  push:
+    tags:
+      - '*'
   repository_dispatch:
   workflow_dispatch:
     inputs:
@@ -40,12 +43,36 @@ jobs:
         with:
           script-name: run.py
           onefile: true
+          include-plugin-directory: doc
+          include-plugin-files: README.md
 
       - name: Upload Artifacts
+        id: artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ runner.os }} Build
+          name: ${{ runner.os }}_build
           path: |
             build/*.exe
             build/*.bin
             build/*.app/**/*
+        run echo "::set-output name=status::success"
+
+      - name: Download all from build
+          uses: actions/download-artifact@v3
+          with:
+            name: notion_sync
+            - name: Display structure of downloaded files
+              run: ls -R
+
+      - name: Create Release and Upload Release Asset
+          uses: softprops/action-gh-release@v1
+          if: steps.artifacts.outputs.status == 'success' && !cancelled()
+          with:
+            tag_name: ${{ github.ref }}
+            name: Release ${{ github.ref }}
+            draft: false
+            prerelease: false
+            files: |
+              Windows_build.zip
+              Linux_build.zip
+              macOS_buils.zip
