@@ -71,15 +71,15 @@ jobs:
           mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
           cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
 
-      - name: Packages Files
+      - name: Packages Windows Files
         if ${{ runner.os }} == 'Windows':
           run: |
             zip -r notion_sync-windows.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
-        else:
+      - name: Packages tar Files
+        if ${{ runner.os }} == 'Linux' || ${{ runner.os }} == 'macOS':
           run: |
             tar -zcf notion_sync-${{ runner.os }}.tar.gz ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
-
-
+            
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
