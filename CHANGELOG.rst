@@ -13,6 +13,15 @@
 
 [Unreleased]
 ============
+`[v0.1.4-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.4-alpha...v0.1.4-beta>`_ - 2023-03-13
+========================
+- fix: 修复监控全日期内报错的问题
+- fix: 修复标记日期错位的问题
+
+.. tip::
+    - 因个人精力原因导致一些pr未做检查就合并带来了一些问题，以至于带来使用上的不便向大家道歉！
+    后续我会花时间逐一验证再合并！
+
 `[v0.1.4-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.3-alpha...v0.1.4-alpha>`_ - 2023-03-10
 ========================
 - 新增Github Actions自动同步 `[pr#26] <https://github.com/Qliangw/notion_sync_data/pull/26>`_
