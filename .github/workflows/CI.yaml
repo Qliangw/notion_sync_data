@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  CI:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: create config
+        run: cp doc/config.yaml.simple doc/config.yaml
+      - name: modify config.yamal
+        run: |
+          sed -e 's/user_id: .*/user_id: '\''${{ secrets.DOUBAN_USER_ID }}'\''/' \
+              -e 's/day: .*/day: 3/' \
+              -e 's/user_agent : /user_agent: Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/109.0.0.0 Safari\/537.36/' \
+              -e 's/token: .*/token: ${{ secrets.NOTION_TOKEN }}/' \
+              -e 's/book_database_id: .*/book_database_id: ${{ secrets.NOTION_BOOKS_DB }}/' \
+              -e 's/movie_database_id: .*/movie_database_id: ${{ secrets.NOTION_MOVIE_DB }}/' \
+              -e 's/music_database_id: .*/music_database_id: ${{ secrets.NOTION_MUSIC_DB }}/' \
+              -e 's/game_database_id: .*/game_database_id: ${{ secrets.NOTION_GAME_DB }}/' \
+              doc/config.yaml
+      - name: install python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - name: install python requirements
+        run: pip install -r requirements.txt
+      - name: sync douban
+        if: env.DOUBAN_USER_ID != null && env.NOTION_TOKEN != null && env.NOTION_BOOKS_DB != null && env.NOTION_MUSIC_DB != null && env.NOTION_MOVIE_DB != null && env.NOTION_GAME_DB != null
+        run: |
+          python3 run.py -m music -s all
+          python3 run.py -m book -s all
+          python3 run.py -m movie -s all
+          python3 run.py -m game -s all
