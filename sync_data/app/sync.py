@@ -87,30 +87,18 @@ def get_monitoring_and_update(instance,
 
             # 当前媒体标记状态
             now_status = ""
-            if media_status == MediaStatus.WISH.value and media_type == MediaType.GAME.value:
+            if media_status == MediaStatus.WISH.value and media_type != MediaType.GAME.value:
+                now_status = "想看"
+            elif media_status == MediaStatus.DO.value and media_type != MediaType.GAME.value:
+                now_status = "在看"
+            elif media_status == MediaStatus.COLLECT.value and media_type != MediaType.GAME.value:
+                now_status = "看过"
+            elif media_status == MediaStatus.WISH.value and media_type == MediaType.GAME.value:
                 now_status = "想玩"
             elif media_status == MediaStatus.DO.value and media_type == MediaType.GAME.value:
                 now_status = "在玩"
             elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.GAME.value:
                 now_status = "玩过"
-            elif media_status == MediaStatus.WISH.value and media_type == MediaType.MUSIC.value:
-                now_status = "想听"
-            elif media_status == MediaStatus.DO.value and media_type == MediaType.MUSIC.value:
-                now_status = "在听"
-            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.MUSIC.value:
-                now_status = "听过"
-            elif media_status == MediaStatus.WISH.value and media_type == MediaType.BOOK.value:
-                now_status = "想读"
-            elif media_status == MediaStatus.DO.value and media_type == MediaType.BOOK.value:
-                now_status = "在读"
-            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.BOOK.value:
-                now_status = "读过"
-            elif media_status == MediaStatus.WISH.value and media_type == MediaType.MOVIE.value:
-                now_status = "想看"
-            elif media_status == MediaStatus.DO.value and media_type == MediaType.MOVIE.value:
-                now_status = "在看"
-            elif media_status == MediaStatus.COLLECT.value and media_type == MediaType.MOVIE.value:
-                now_status = "看过"
 
             # 查询数据库中是否存在该媒体，通过检索url唯一值
             notion_media_status, old_data_json = get_notion_media_status(token=token,
@@ -314,6 +302,9 @@ def start_sync(media_type, media_status):
         log_detail.info(f"{err}")
 
 
+
+
+
 def init_database():
     """
     初始化数据库
@@ -350,8 +341,7 @@ def init_simple_database(config_dict, media_type, token, page_id):
     """
     try:
         # 配置notion数据库id
-        if config_dict['notion'][f'{media_type}_database_id'] is None or config_dict['notion'][
-            f'{media_type}_database_id'] == '':
+        if config_dict['notion'][f'{media_type}_database_id'] is None or config_dict['notion'][f'{media_type}_database_id'] == '':
             database_id = create_database(token=token, media_type=media_type, page_id=page_id)
             database_id = database_id.replace('-', '')
 

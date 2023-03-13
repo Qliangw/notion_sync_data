@@ -67,7 +67,7 @@ def get_body(data_dict, database_id, media_status, media_type):
     :param database_id:
     :return:
     """
-    music_status, movie_status, game_status, book_status = get_media_status(media_status)
+    music_status, status, game_status = get_media_status(media_status)
 
     log_detail.info(f"【RUN】- {media_type}数据信息整理为json格式")
     rating = data_dict[MediaInfo.RATING_F.value]
@@ -104,6 +104,11 @@ def get_body(data_dict, database_id, media_status, media_type):
                         }
                     }]
                 },
+                "发行时间": {
+                    "select": {
+                        "name": data_dict[MediaInfo.RELEASE_DATE.value][0:4]
+                    }
+                },
                 "标记状态": {
                     "select": {
                         "name": f"{music_status}"
@@ -111,44 +116,9 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "豆瓣链接": {
                     "url": f"{data_dict[MediaInfo.URL.value]}"
-                },
-                "短评": {
-                    "rich_text": [{
-                        "type": "text",
-                        "text": {
-                            "content": data_dict[MediaInfo.MY_COMMENT.value]
-                        }
-                    }]
-                },
-                "ISRC": {
-                    "rich_text": [{
-                        "type": "text",
-                        "text": {
-                            "content": data_dict[MediaInfo.ISRC.value]
-                        }
-                    }]
                 }
             }
         }
-
-        # 发行时间
-        if data_dict[MediaInfo.RELEASE_DATE.value]:
-            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
-                                                property_params=data_dict[MediaInfo.RELEASE_DATE.value][0:4])
-            body["properties"]["发行时间"] = tmp_dict
-
-        # 类型
-        if data_dict[MediaInfo.GENRE.value]:
-            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
-                                                property_params=data_dict[MediaInfo.GENRE.value])
-            body["properties"]["类型"] = tmp_dict
-
-        # 出版者
-        if data_dict[MediaInfo.MUSIC_PUB.value]:
-            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.SELECT.value,
-                                                property_params=data_dict[MediaInfo.MUSIC_PUB.value])
-            body["properties"]["出版者"] = tmp_dict
-
         # 评分
         if data_dict[MediaInfo.RATING_F.value]:
             rating_f = float(data_dict[MediaInfo.RATING_F.value])
@@ -161,18 +131,6 @@ def get_body(data_dict, database_id, media_status, media_type):
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.NUMBER.value,
                                                 property_params=data_dict[MediaInfo.ASSESS.value])
             body["properties"]["评分人数"] = tmp_dict
-
-        # 标记日期
-        if data_dict[MediaInfo.MY_DATE.value]:
-            tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
-                                                property_params=data_dict[MediaInfo.MY_DATE.value])
-            body["properties"]["标记时间"] = tmp_dict
-
-        # 个人评分
-        if data_dict[MediaInfo.MY_RATING.value]:
-            tmp_dict = get_my_rate(data_dict)
-            body["properties"]["个人评分"] = tmp_dict
-
         return body
     elif media_type == MediaType.MOVIE.value:
 
@@ -233,7 +191,7 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "标记状态": {
                     "select": {
-                        "name": f"{movie_status}"
+                        "name": f"{status}"
                     }
                 },
                 "分类": {
@@ -286,7 +244,7 @@ def get_body(data_dict, database_id, media_status, media_type):
             body["properties"]["评分人数"] = tmp_dict
 
         # 标记日期
-        if data_dict[MediaInfo.MY_DATE.value] and data_dict[MediaInfo.MY_DATE.value] != "\n":
+        if data_dict[MediaInfo.MY_DATE.value]:
             tmp_dict = get_non_null_params_body(property_type=DatabaseProperty.DATE.value,
                                                 property_params=data_dict[MediaInfo.MY_DATE.value])
             body["properties"]["标记时间"] = tmp_dict
@@ -337,7 +295,7 @@ def get_body(data_dict, database_id, media_status, media_type):
                 },
                 "标记状态": {
                     "select": {
-                        "name": f"{book_status}"
+                        "name": f"{status}"
                     }
                 },
                 "豆瓣链接": {
@@ -605,11 +563,11 @@ def create_database(token, page_id, media_type):
                 "评分": {"number": {}},
                 "出版者": {"select": {}},
                 "发行时间": {"select": {}},
-                "ISRC": {"rich_text": {}},
+                "ISRC": {"url": {}},
                 "豆瓣链接": {"url": {}},
                 "评分人数": {"number": {}},
                 "短评": {"rich_text": {}},
-                "类型": {"select": {}},
+                "类型": {"multi_select": {}},
                 "标记状态": {"select": {}},
                 "标记时间": {"date": {}},
                 "个人评分": {"select": {"options": [
@@ -773,41 +731,46 @@ def get_flag_update_old_database(data_dict, page_id, token, media_status, media_
 
 
 def get_new_update_body(data_dict, media_status, media_type):
-    music_status, movie_status, game_status, book_status = get_media_status(media_status)
+    music_status, status, game_status = get_media_status(media_status)
 
     log_detail.info(f"【RUN】- {media_type}数据信息整理为json格式")
     if media_type == MediaType.MUSIC.value:
-        return get_common_body(data_dict, music_status)
+        body = {
+            "properties": {
+                "标记状态": {
+                    "select": {
+                        "name": f"{music_status}"
+                    }
+                }
+            }
+        }
+        return body
     elif media_type == MediaType.MOVIE.value:
-        return get_common_body(data_dict, movie_status)
+        return get_common_body(data_dict, status)
     elif media_type == MediaType.BOOK.value:
-        return get_common_body(data_dict, book_status)
+        return get_common_body(data_dict, status)
     elif media_type == MediaType.GAME.value:
         return get_common_body(data_dict, game_status)
 
 
 def get_media_status(media_status):
     if media_status == MediaStatus.WISH.value:
-        movie_status = "想看"
+        status = "想看"
         music_status = "想听"
         game_status = "想玩"
-        book_status = "想读"
     elif media_status == MediaStatus.DO.value:
-        movie_status = "在看"
+        status = "在看"
         music_status = "在听"
         game_status = "在玩"
-        book_status = "在读"
     elif media_status == MediaStatus.COLLECT.value:
-        movie_status = "看过"
+        status = "看过"
         music_status = "听过"
         game_status = "玩过"
-        book_status = "读过"
     else:
-        movie_status = ""
+        status = ""
         music_status = ""
         game_status = ""
-        book_status = ""
-    return music_status, movie_status, game_status, book_status
+    return music_status, status, game_status
 
 
 def get_common_body(data_dict, status):
