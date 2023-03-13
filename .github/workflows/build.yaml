@@ -55,13 +55,11 @@ jobs:
             build/*.exe
             build/*.bin
             build/*.app/**/*
-        run: echo "::set-output name=status::success"
 
       - name: Download all from build
         uses: actions/download-artifact@v3
         with:
           name: notion_sync
-        run: ls -R
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
