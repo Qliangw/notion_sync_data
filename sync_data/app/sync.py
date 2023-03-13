@@ -258,7 +258,8 @@ def start_sync(media_type, media_status):
     # 用户id脱敏处理
     x_user_id = get_desensitization_of_user_info(user_id)
     log_detail.info(f"【Config】- 取得用户 id：{x_user_id}")
-    monitoring_day = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_DAY.value] or int(env.get("DOUBAN_DAY"))
+    monitoring_day = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_DAY.value] or int(
+        env.get("DOUBAN_DAY") or 0)
     log_detail.info(f"【Config】- 取得监控日期：{monitoring_day}")
 
     # 获取notion数据库的信息
@@ -300,9 +301,6 @@ def start_sync(media_type, media_status):
                                                  database_id=database_id)
     except Exception as err:
         log_detail.info(f"{err}")
-
-
-
 
 
 def init_database():
