@@ -62,8 +62,8 @@ jobs:
 
       - name: Display structure of downloaded files
         run: |
-          echo ${{steps.download.outputs.download-path}}
-          ls -R
+          echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
+          ls
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
@@ -72,7 +72,4 @@ jobs:
           name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-          files: |
-            notion_sync_Windows
-            notion_sync_Linux
-            notion_sync_macOS
+          files: ${{ env.WORK_DIR }}/notion_sync_*
