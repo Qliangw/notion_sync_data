@@ -64,6 +64,21 @@ jobs:
         run: |
           echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
           ls
+          echo ${{ env.WORK_DIR }}
+
+      - name: Organize files
+        run: |
+          mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
+          cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+
+      - name: Packages Files
+        if ${{ runner.os }} == 'Windows':
+          run: |
+            zip -r notion_sync-windows.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
+        else:
+          run: |
+            tar -zcf notion_sync-${{ runner.os }}.tar.gz ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
+
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
@@ -73,4 +88,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/*
+            ${{ env.WORK_DIR }}/*${{ runner.os }}*
+            ${{ env.WORK_DIR }}\\*${{ runner.os }}*
