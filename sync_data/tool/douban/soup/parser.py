@@ -336,7 +336,6 @@ class ParserHtmlText:
         movie_dict[MediaInfo.ASSESS.value] = int(rating_list[1])
         movie_dict[MediaInfo.IMG.value] = movie_img
         movie_dict[MediaInfo.RELATED.value] = related_infos
-        movie_dict[MediaInfo.MY_DATE.value] = my_date
         movie_dict[MediaInfo.MY_RATING.value] = my_rating
         movie_dict[MediaInfo.MY_COMMENT.value] = my_comment
         movie_dict[MediaInfo.RELEASE_DATE.value] = year

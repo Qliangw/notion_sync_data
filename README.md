@@ -12,8 +12,10 @@
 
 > 该库是学习python做的自用小工具，代码参考于网络。（首个用python编写的工具，写的比较烂）
 
+**PR请申请合并至dev分支！！！**
 
-**最新版本：**[v0.1.3-alpha](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.3-alpha)
+
+**最新版本：**[v0.1.4-alpha](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.1.4-alpha)
 
 
 ## 功能
@@ -22,6 +24,7 @@
 - [x] 创建notion数据库
 - [x] 插入notion库
 - [x] 已添加的不再重复添加（根据豆瓣链接判断）
+- [x] Github Actions自动同步
 
 **TODO**
 
