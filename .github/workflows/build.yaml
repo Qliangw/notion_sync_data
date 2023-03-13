@@ -58,11 +58,12 @@ jobs:
 
       - name: Download all from build
         uses: actions/download-artifact@v3
-        with:
-          name: |
-            notion_sync_Windows
-            notion_sync_Linux
-            notion_sync_macOS
+        id: download
+
+      - name: Display structure of downloaded files
+        run: |
+          echo ${{steps.download.outputs.download-path}}
+          ls -R
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
