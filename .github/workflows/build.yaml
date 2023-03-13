@@ -35,7 +35,7 @@ jobs:
         run: |
           pip install -r requirements.txt -r requirements-dev.txt
 
-      - Name: Build Executable
+      - name: Build Executable
         uses: Nuitka/Nuitka-Action@v0.4
         with:
           script-name: run
