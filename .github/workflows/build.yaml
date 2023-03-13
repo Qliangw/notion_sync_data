@@ -55,7 +55,7 @@ jobs:
             build/*.exe
             build/*.bin
             build/*.app/**/*
-        run echo "::set-output name=status::success"
+        run: echo "::set-output name=status::success"
 
       - name: Download all from build
           uses: actions/download-artifact@v3
