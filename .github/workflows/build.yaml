@@ -50,7 +50,7 @@ jobs:
         id: artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ runner.os }}_build
+          name: notion_sync_${{ runner.os }}
           path: |
             build/*.exe
             build/*.bin
@@ -59,7 +59,10 @@ jobs:
       - name: Download all from build
         uses: actions/download-artifact@v3
         with:
-          name: notion_sync
+          name: |
+            notion_sync_Windows.zip
+            notion_sync_Linux.zip
+            notion_sync_macOS.zip
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
@@ -69,6 +72,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            Windows_build.zip
-            Linux_build.zip
-            macOS_buils.zip
+            notion_sync_Windows.zip
+            notion_sync_Linux.zip
+            notion_sync_macOS.zip
