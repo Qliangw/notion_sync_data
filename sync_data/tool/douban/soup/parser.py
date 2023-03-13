@@ -47,17 +47,17 @@ class ParserHtmlText:
                 for url in info:
                     url_list.append(url.get('href'))
 
+            mark_date = self.soup.select('span.date')
+            # 处理所有标记时间
+            num = 0
+
+            while num < len(mark_date):
+                mark_date_dict[num] = list(mark_date[num].strings)
+                # mark_date_dict[num] = ''.join([i.rstrip()[:-9] for i in mark_date_dict[num] if i.strip() != ''])
+                mark_date_dict[num] = ''.join([i.split("\n", 1)[0] for i in mark_date_dict[num] if i.strip() != ''])
+                num += 1
+
             if monitoring_day != 0:
-                mark_date = self.soup.select('span.date')
-                # 处理所有标记时间
-                num = 0
-
-                while num < len(mark_date):
-                    mark_date_dict[num] = list(mark_date[num].strings)
-                    # mark_date_dict[num] = ''.join([i.rstrip()[:-9] for i in mark_date_dict[num] if i.strip() != ''])
-                    mark_date_dict[num] = ''.join([i.split("\n", 1)[0] for i in mark_date_dict[num] if i.strip() != ''])
-                    num += 1
-
                 # 获取当天时间
                 # today = datetime.datetime.now()
                 today = datetime.datetime.now()

@@ -4,7 +4,6 @@
 # @Function:
 
 import random
-from os import environ as env
 
 from sync_data.data.user_config import ConfigName, get_desensitization_of_user_info
 from sync_data.tool.douban import base
@@ -123,7 +122,7 @@ def get_monitoring_and_update(instance,
                     # 添加url
                     if html_dict:
                         html_dict[MediaInfo.URL.value] = url
-                        html_dict[MediaInfo.MY_DATE.value] = url_dict['mark_date'][count_num]
+                        html_dict[MediaInfo.MY_DATE.value] = url_dict['mark_date'][count_num-1]
                     else:
                         log_detail.warn(f"【RUN】- 解析该页面出现问题，媒体链接：{url}")
                         parser_err_url_list.append(url)
@@ -250,32 +249,32 @@ def start_sync(media_type, media_status):
 
     # 获取浏览器user-agent
     user_agent = config_dict[ConfigName.USER_AGENT.value] or env.get("USER_AGENT")
-    user_cookie = config_dict[ConfigName.DOUBAN.value][ConfigName.USER_COOKIE.value] or env.get("USER_COOKIE")
+    user_cookie = config_dict[ConfigName.DOUBAN.value][ConfigName.USER_COOKIE.value]
     log_detail.info(f"【Config】- 取得浏览器 user-agent：{user_agent}")
 
     # 获取豆瓣信息
-    user_id = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_USER_ID.value] or env.get("DOUBAN_USER_ID")
+    user_id = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_USER_ID.value]
     # 用户id脱敏处理
     x_user_id = get_desensitization_of_user_info(user_id)
     log_detail.info(f"【Config】- 取得用户 id：{x_user_id}")
-    monitoring_day = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_DAY.value] or int(env.get("DOUBAN_DAY"))
+    monitoring_day = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_DAY.value]
     log_detail.info(f"【Config】- 取得监控日期：{monitoring_day}")
 
     # 获取notion数据库的信息
-    token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value] or env.get("NOTION_TOKEN")
+    token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
     x_token = get_desensitization_of_user_info(token)
     log_detail.info(f"【Config】- 取得 notion 的 token：{x_token}")
 
     # auto_config = Config().get_config()
     database_id = ''
     if media_type == MediaType.BOOK.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_BOOK.value] or env.get("NOTION_BOOKS_DB")
+        database_id = config_dict['notion'][ConfigName.NOTION_BOOK.value]
     elif media_type == MediaType.MUSIC.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_MUSIC.value] or env.get("NOTION_MUSIC_DB")
+        database_id = config_dict['notion'][ConfigName.NOTION_MUSIC.value]
     elif media_type == MediaType.MOVIE.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_MOVIE.value] or env.get("NOTION_MOVIE_DB")
+        database_id = config_dict['notion'][ConfigName.NOTION_MOVIE.value]
     elif media_type == MediaType.GAME.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_GAME.value] or env.get("NOTION_GAME_DB")
+        database_id = config_dict['notion'][ConfigName.NOTION_GAME.value]
     try:
         if database_id is None:
             log_detail.info(f"【Config】配置文件缺少重要参数")
@@ -299,7 +298,7 @@ def start_sync(media_type, media_status):
                                                  token=token,
                                                  database_id=database_id)
     except Exception as err:
-        log_detail.info(f"{err}")
+        log_detail.info(f"【ERROR】start_sync:{err}")
 
 
 
