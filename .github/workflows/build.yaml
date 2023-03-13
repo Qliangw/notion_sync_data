@@ -73,4 +73,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}
+            ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/*
