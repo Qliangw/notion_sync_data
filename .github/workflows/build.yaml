@@ -72,4 +72,5 @@ jobs:
           name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-          files: ${{ env.WORK_DIR }}/notion_sync_*
+          files: |
+            ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}
