@@ -13,6 +13,10 @@
 
 [Unreleased]
 ============
+`[v0.2.0-release] <https://github.com/Qliangw/notion_sync_data/compare/v0.2.0-beta...v0.2.0-release>`_ - 2023-03-14
+========================
+- fix: 修复自动编译问题
+
 `[v0.2.0-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.2.0-alpha...v0.2.0-beta>`_ - 2023-03-14
 ========================
 - fix: 修复多平台编译问题

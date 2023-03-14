@@ -1,89 +1,101 @@
-
-name: Build Notion Sync Tools
+name: Build and Release
 
 on:
   push:
     tags:
       - '*'
   release:
-    types: [created]
+    types: [prereleased]
   repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest] #
+   build:
+     strategy:
+       matrix:
+         os: [macos-latest, ubuntu-latest, windows-latest] #
 
-    runs-on: ${{ matrix.os }}
+     runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: Check-out repository
-        uses: actions/checkout@v3
+     steps:
+       - name: Check-out repository
+         uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-          cache: 'pip'
-          cache-dependency-path: |
-            **/requirements*.txt
+       - name: Setup Python
+         uses: actions/setup-python@v4
+         with:
+           python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+           cache: 'pip'
+           cache-dependency-path: |
+             **/requirements*.txt
 
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+       - name: Install Dependencies
+         run: |
+           pip install -r requirements.txt
 
-      - name: Build Executable
-        uses: Nuitka/Nuitka-Action@main
-        with:
-          script-name: run.py
-          onefile: true
-          include-plugin-directory: doc
-          include-plugin-files: README.md
+       - name: Build Executable
+         uses: Nuitka/Nuitka-Action@main
+         with:
+           script-name: run.py
+           onefile: true
+           include-plugin-directory: doc
+           include-plugin-files: README.md
 
-      - name: Upload Artifacts
-        id: artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: notion_sync_${{ runner.os }}
-          path: |
-            build/*.exe
-            build/*.bin
-            build/*.app/**/*
-
-
-  release:
+       - name: Upload Artifacts
+         id: artifacts
+         uses: actions/upload-artifact@v3
+         with:
+           name: notion_sync_${{ runner.os }}
+           path: |
+             build/*.exe
+             build/*.bin
+             build/*.app/**/*
+   release:
     needs: build
     runs-on: ubuntu-latest
-
+    #if: ${{ github.event_name == 'release'}}
     permissions:
       contents: write
-
-    - name: Download all from build
+    steps:
+      - name: Download all from build
         uses: actions/download-artifact@v3
         id: download
 
-    - name: Display structure of downloaded files
-      run: |
-        echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
-        ls
+      - name: Display structure of downloaded files
+        run: |
+          echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
+          ls
 
-    - name: Organize files
-      run: |
-        mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
-        cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+      - name: Organize files
+        run: |
+          wget https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/doc/config.yaml.simple
+          mkdir -p ${{ env.WORK_DIR }}/notion_sync_Windows/doc 
+          mkdir -p ${{ env.WORK_DIR }}/notion_sync_macOS/doc 
+          mkdir -p ${{ env.WORK_DIR }}/notion_sync_Linux/doc 
+          cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_Windows/doc/config.yaml
+          cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_macOS/doc/config.yaml
+          cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_Linux/doc/config.yaml
 
-    - name: Packages Files
-      run: |
-        zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
+      - name: Packages Files
+        run: |
+          cd ${{ env.WORK_DIR }}
+          zip -r notion_sync_Linux.zip notion_sync_Linux
+          zip -r notion_sync_macOS.zip notion_sync_macOS
+          zip -r notion_sync_Windows.zip notion_sync_Windows
 
-    - name: Create Release and Upload Release Asset
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref }}
-        name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-        files: |
-          ${{ env.WORK_DIR }}/*${{ runner.os }}*
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release
+          draft: false
+          prerelease: false
+          files: |
+            ${{ env.WORK_DIR }}/**.zip
