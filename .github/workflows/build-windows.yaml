@@ -18,57 +18,55 @@ jobs:
     steps:
       - name: Check-out repository
         uses: actions/checkout@v3
-        id: repo
 
-#       - name: Setup Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-#           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-#           cache: 'pip'
-#           cache-dependency-path: |
-#             **/requirements*.txt
-      
-#       - name: Install Dependencies
-#         run: |
-#           pip install -r requirements.txt
-      
-#       - name: Build Executable
-#         uses: Nuitka/Nuitka-Action@main
-#         with:
-#           script-name: run.py
-#           onefile: true
-#           include-plugin-directory: doc
-#           include-plugin-files: README.md
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+          cache: 'pip'
+          cache-dependency-path: |
+            **/requirements*.txt
 
-#       - name: Upload Artifacts
-#         id: artifacts
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: notion_sync_${{ runner.os }}
-#           path: |
-#             build/*.exe
-            
-#       - name: Download all from build
-#         uses: actions/download-artifact@v3
-#         id: download
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build Executable
+        uses: Nuitka/Nuitka-Action@main
+        with:
+          script-name: run.py
+          onefile: true
+          include-plugin-directory: doc
+          include-plugin-files: README.md
+
+      - name: Upload Artifacts
+        id: artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: notion_sync_${{ runner.os }}
+          path: |
+            build/*.exe
+
+      - name: Download all from build
+        uses: actions/download-artifact@v3
+        id: download
 
       - name: Display structure of downloaded files
         run: |
+          echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
-          
+
       - name: Organize files
         run: |
-          mkdir ./notion_sync_${{ runner.os }}/doc
-          ls ./notion_sync_${{ runner.os }} -R
-          cp ./doc/config.yaml.simple ./notion_sync_${{ runner.os }}/doc/config.yaml
-      
+          mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
+          cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+
       - name: Packages Files
         run: |
-          # zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
-          Compress-Archive -Path ./notion_sync_${{ runner.os }}/ ./notion_sync_${{ runner.os }}'.zip'
+          Compress-Archive -Path ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/ ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}'.zip'
           ls
-      
+
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
@@ -77,4 +75,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./*${{ runner.os }}*
+            ${{ env.WORK_DIR }}/*.zip
