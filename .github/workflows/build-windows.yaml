@@ -1,5 +1,4 @@
-
-name: Build Notion Sync Tools
+name: Build Windows
 
 on:
   push:
@@ -7,17 +6,12 @@ on:
       - '*'
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest] # windows-latest
+        os: [windows-latest] # windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -53,8 +47,6 @@ jobs:
           name: notion_sync_${{ runner.os }}
           path: |
             build/*.exe
-            build/*.bin
-            build/*.app/**/*
 
       - name: Download all from build
         uses: actions/download-artifact@v3
@@ -62,7 +54,8 @@ jobs:
 
       - name: Display structure of downloaded files
         run: |
-          echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
+          echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "UPLOAD_FILE=${{steps.download.outputs.download-path}}\notion_sync_${{ runner.os }}.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
 
       - name: Organize files
@@ -72,7 +65,9 @@ jobs:
 
       - name: Packages Files
         run: |
-          zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
+          Compress-Archive -Path ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/ ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}'.zip'
+          cp ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}.zip /
+          ls /**.zip
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
@@ -82,4 +77,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ${{ env.WORK_DIR }}/*${{ runner.os }}*
+            **.zip
