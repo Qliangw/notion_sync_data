@@ -18,6 +18,7 @@ jobs:
     steps:
       - name: Check-out repository
         uses: actions/checkout@v3
+        id: repo
 
 #       - name: Setup Python
 #         uses: actions/setup-python@v4
@@ -54,7 +55,7 @@ jobs:
 
       - name: Display structure of downloaded files
         run: |
-          echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "WORK_DIR=${{steps.repo.outputs.repo-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
           echo ${{ env.WORK_DIR }}
           
