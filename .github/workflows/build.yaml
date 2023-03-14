@@ -52,7 +52,7 @@ jobs:
 #             build/*.bin
 #             build/*.app/**/*
 
-  release:
+  build:
     #needs: build
     runs-on: ubuntu-latest
     #if: ${{ github.event_name == 'release'}}
