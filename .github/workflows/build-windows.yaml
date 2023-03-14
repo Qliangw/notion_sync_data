@@ -1,9 +1,9 @@
 name: Build Windows
 
 on:
-  push:
-    tags:
-      - '*'
+#  push:
+#    tags:
+#      - '*'
   repository_dispatch:
   workflow_dispatch:
 
