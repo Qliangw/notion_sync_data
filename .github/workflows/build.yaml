@@ -21,6 +21,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    permissions:
+      contents: write
+
     steps:
       - name: Check-out repository
         uses: actions/checkout@v3
