@@ -2,11 +2,11 @@
 name: Build Notion Sync Tools
 
 on:
-#  push:
-#    tags:
-#      - '*'
-  release:
-    types: [created]
+  push:
+    tags:
+      - '*'
+  #release:
+#types: [created]
   repository_dispatch:
 
 jobs:
