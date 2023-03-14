@@ -2,9 +2,9 @@
 name: Build Notion Sync Tools
 
 on:
-  push:
-    tags:
-      - '*'
+#  push:
+#    tags:
+#      - '*'
   release:
     types: [created]
   repository_dispatch:
@@ -71,19 +71,24 @@ jobs:
 
       - name: Organize files
         run: |
+          wget https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/doc/config.yaml.simple
           mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
-          cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+          cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_Windows/doc/config.yaml
+          cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_macOS/doc/config.yaml
+          cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_Linux/doc/config.yaml
 
       - name: Packages Files
         run: |
-          zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
+          zip -r notion_sync_Linux.zip ${{ env.WORK_DIR }}/notion_sync_Linux
+          zip -r notion_sync_macOS.zip ${{ env.WORK_DIR }}/notion_sync_macOS
+          zip -r notion_sync_Windows.zip ${{ env.WORK_DIR }}/notion_sync_Windows
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
+          name: Release
           draft: false
           prerelease: false
           files: |
-            ${{ env.WORK_DIR }}/*${{ runner.os }}*
+            ${{ env.WORK_DIR }}/**.zip
