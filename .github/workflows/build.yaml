@@ -1,5 +1,4 @@
-
-name: Build Notion Sync Tools
+name: Build and Release
 
 on:
   push:
