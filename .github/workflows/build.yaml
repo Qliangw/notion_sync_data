@@ -10,50 +10,50 @@ on:
   repository_dispatch:
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest] #
+#   build:
+#     strategy:
+#       matrix:
+#         os: [macos-latest, ubuntu-latest, windows-latest] #
 
-    runs-on: ${{ matrix.os }}
+#     runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: Check-out repository
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Check-out repository
+#         uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-          cache: 'pip'
-          cache-dependency-path: |
-            **/requirements*.txt
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+#           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+#           cache: 'pip'
+#           cache-dependency-path: |
+#             **/requirements*.txt
 
-      - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+#       - name: Install Dependencies
+#         run: |
+#           pip install -r requirements.txt
 
-      - name: Build Executable
-        uses: Nuitka/Nuitka-Action@main
-        with:
-          script-name: run.py
-          onefile: true
-          include-plugin-directory: doc
-          include-plugin-files: README.md
+#       - name: Build Executable
+#         uses: Nuitka/Nuitka-Action@main
+#         with:
+#           script-name: run.py
+#           onefile: true
+#           include-plugin-directory: doc
+#           include-plugin-files: README.md
 
-      - name: Upload Artifacts
-        id: artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: notion_sync_${{ runner.os }}
-          path: |
-            build/*.exe
-            build/*.bin
-            build/*.app/**/*
+#       - name: Upload Artifacts
+#         id: artifacts
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: notion_sync_${{ runner.os }}
+#           path: |
+#             build/*.exe
+#             build/*.bin
+#             build/*.app/**/*
 
   release:
-    needs: build
+    #needs: build
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'release'}}
 
@@ -72,7 +72,9 @@ jobs:
       - name: Organize files
         run: |
           wget https://raw.githubusercontent.com/Qliangw/notion_sync_data/main/doc/config.yaml.simple
-          mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
+          mkdir -p ${{ env.WORK_DIR }}/notion_sync_Windows/doc 
+          mkdir -p ${{ env.WORK_DIR }}/notion_sync_macOS/doc 
+          mkdir -p ${{ env.WORK_DIR }}/notion_sync_Linux/doc 
           cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_Windows/doc/config.yaml
           cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_macOS/doc/config.yaml
           cp ./config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_Linux/doc/config.yaml
