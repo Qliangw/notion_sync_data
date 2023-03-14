@@ -6,11 +6,6 @@ on:
       - '*'
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
 
 jobs:
   build:
@@ -32,9 +27,11 @@ jobs:
           cache: 'pip'
           cache-dependency-path: |
             **/requirements*.txt
+      
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+      
       - name: Build Executable
         uses: Nuitka/Nuitka-Action@main
         with:
@@ -50,20 +47,21 @@ jobs:
           name: notion_sync_${{ runner.os }}
           path: |
             build/*.exe
-            build/*.bin
-            build/*.app/**/*
+            
       - name: Download all from build
         uses: actions/download-artifact@v3
         id: download
 
       - name: Display structure of downloaded files
         run: |
-          echo "WORK_DIR"=${{steps.download.outputs.download-path}} | Out-File -FilePath $env:GITHUB_ENV -Append # no need for -Encoding utf8
+          echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
+          
       - name: Organize files
         run: |
           mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
           cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+      
       - name: Packages Files
         run: |
           zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
