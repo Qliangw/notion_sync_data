@@ -55,7 +55,7 @@ jobs:
       - name: Display structure of downloaded files
         run: |
           echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "UPLOAD_FILE=${{steps.download.outputs.download-path}}/notion_sync_${{ runner.os }}.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "UPLOAD_FILE=${{steps.download.outputs.download-path}}\notion_sync_${{ runner.os }}.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
 
       - name: Organize files
