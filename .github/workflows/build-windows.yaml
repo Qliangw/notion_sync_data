@@ -57,10 +57,11 @@ jobs:
           echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
           
-#       - name: Organize files
-#         run: |
-#           mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
-#           cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+      - name: Organize files
+        run: |
+          mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
+          cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+          ls ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }} -R
       
       - name: Packages Files
         run: |
