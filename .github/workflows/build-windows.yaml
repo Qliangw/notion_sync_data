@@ -66,14 +66,15 @@ jobs:
       - name: Packages Files
         run: |
           Compress-Archive -Path ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/ ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}'.zip'
-          ls
+          cp ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}.zip /
+          ls /**.zip
 
       - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
           draft: false
           prerelease: false
           files: |
-            ${{ env.UPLOAD_FILE }}
+            **.zip
