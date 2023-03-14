@@ -52,10 +52,10 @@ jobs:
             build/*.bin
             build/*.app/**/*
 
-
   release:
     needs: build
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release'}}
 
     permissions:
       contents: write
