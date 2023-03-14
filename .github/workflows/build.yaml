@@ -5,24 +5,17 @@ on:
   push:
     tags:
       - '*'
+  release:
+    types: [created]
   repository_dispatch:
-  workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest] # windows-latest
+        os: [macos-latest, ubuntu-latest, windows-latest] #
 
     runs-on: ${{ matrix.os }}
-
-    permissions:
-      contents: write
 
     steps:
       - name: Check-out repository
@@ -59,30 +52,38 @@ jobs:
             build/*.bin
             build/*.app/**/*
 
-      - name: Download all from build
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    - name: Download all from build
         uses: actions/download-artifact@v3
         id: download
 
-      - name: Display structure of downloaded files
-        run: |
-          echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
-          ls
+    - name: Display structure of downloaded files
+      run: |
+        echo "WORK_DIR"=${{steps.download.outputs.download-path}} >> $GITHUB_ENV
+        ls
 
-      - name: Organize files
-        run: |
-          mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
-          cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+    - name: Organize files
+      run: |
+        mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
+        cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
 
-      - name: Packages Files
-        run: |
-          zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
+    - name: Packages Files
+      run: |
+        zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
 
-      - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-          files: |
-            ${{ env.WORK_DIR }}/*${{ runner.os }}*
+    - name: Create Release and Upload Release Asset
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+        files: |
+          ${{ env.WORK_DIR }}/*${{ runner.os }}*
