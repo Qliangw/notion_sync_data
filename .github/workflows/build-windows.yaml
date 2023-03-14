@@ -69,7 +69,7 @@ jobs:
           ls
 
       - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
