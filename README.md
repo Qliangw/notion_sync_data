@@ -15,7 +15,7 @@
 **PR请申请合并至dev分支！！！**
 
 
-**最新版本：**[v0.2.0-alpha](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.2.0-alpha)
+**最新版本：**[v0.2.0-beta](https://github.com/Qliangw/notion_sync_data/releases/tag/v0.2.0-beta)
 
 
 ## 功能
