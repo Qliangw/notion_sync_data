@@ -61,8 +61,8 @@ jobs:
       contents: write
     steps:
       - name: Download all from build
-          uses: actions/download-artifact@v3
-          id: download
+        uses: actions/download-artifact@v3
+        id: download
 
       - name: Display structure of downloaded files
         run: |
