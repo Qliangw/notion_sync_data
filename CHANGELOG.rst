@@ -13,6 +13,10 @@
 
 [Unreleased]
 ============
+`[v0.2.0-alpha] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.4-beta...v0.2.0-alpha>`_ - 2023-03-14
+========================
+- feat: 增加windows、Linux、macOS平台，无需安装python
+
 `[v0.1.4-beta] <https://github.com/Qliangw/notion_sync_data/compare/v0.1.4-alpha...v0.1.4-beta>`_ - 2023-03-13
 ========================
 - fix: 修复监控全日期内报错的问题
