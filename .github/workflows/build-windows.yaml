@@ -19,14 +19,14 @@ jobs:
       - name: Check-out repository
         uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-          cache: 'pip'
-          cache-dependency-path: |
-            **/requirements*.txt
+#       - name: Setup Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.10' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+#           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
+#           cache: 'pip'
+#           cache-dependency-path: |
+#             **/requirements*.txt
       
 #       - name: Install Dependencies
 #         run: |
@@ -56,12 +56,14 @@ jobs:
         run: |
           echo "WORK_DIR=${{steps.download.outputs.download-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
+          echo ${{ env.WORK_DIR }}
           
       - name: Organize files
         run: |
           mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
+          cd ${{ env.WORK_DIR }}
+          ls
           cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
-          ls ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }} -R
       
       - name: Packages Files
         run: |
