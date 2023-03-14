@@ -1,4 +1,4 @@
-name: Build Notion Sync Tools
+name: Build Windows
 
 on:
   push:
