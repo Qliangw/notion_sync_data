@@ -4,8 +4,8 @@ on:
   push:
     tags:
       - '*'
-  #release:
-#types: [created]
+  release:
+    types: [published]
   repository_dispatch:
   workflow_dispatch:
     inputs:
@@ -61,8 +61,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    #if: ${{ github.event_name == 'release'}}
-
+    if: ${{ github.event_name == 'release'}}
     permissions:
       contents: write
     steps:
