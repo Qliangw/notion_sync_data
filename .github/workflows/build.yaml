@@ -1,11 +1,11 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      - '*'
+#   push:
+#     tags:
+#       - '*'
   release:
-    types: [published]
+    types: [deleted]
   repository_dispatch:
   workflow_dispatch:
     inputs:
@@ -57,7 +57,6 @@ jobs:
              build/*.exe
              build/*.bin
              build/*.app/**/*
-
   release:
     needs: build
     runs-on: ubuntu-latest
