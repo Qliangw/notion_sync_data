@@ -75,4 +75,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ${{ env.WORK_DIR }}/*.zip
+            ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}.zip
+            ${{ env.WORK_DIR }}/doc/config.yaml.simple
