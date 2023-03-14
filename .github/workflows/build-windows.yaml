@@ -55,21 +55,18 @@ jobs:
 
       - name: Display structure of downloaded files
         run: |
-          echo "WORK_DIR=${{steps.repo.outputs.repo-path}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           ls
-          echo ${{ env.WORK_DIR }}
           
       - name: Organize files
         run: |
-          mkdir ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc
-          cd ${{ env.WORK_DIR }}
-          ls
-          cp ${{ env.WORK_DIR }}/doc/config.yaml.simple ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/doc/config.yaml
+          mkdir ./notion_sync_${{ runner.os }}/doc
+          ls ./notion_sync_${{ runner.os }} -R
+          cp ./doc/config.yaml.simple ./notion_sync_${{ runner.os }}/doc/config.yaml
       
       - name: Packages Files
         run: |
           # zip -r notion_sync-${{ runner.os }}.zip ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/
-          Compress-Archive -Path ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}/ ${{ env.WORK_DIR }}/notion_sync_${{ runner.os }}'.zip'
+          Compress-Archive -Path ./notion_sync_${{ runner.os }}/ ./notion_sync_${{ runner.os }}'.zip'
           ls
       
       - name: Create Release and Upload Release Asset
@@ -80,4 +77,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ${{ env.WORK_DIR }}/*${{ runner.os }}*
+            ./*${{ runner.os }}*
