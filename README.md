@@ -2,8 +2,11 @@
 将网络数据同步到notion笔记，方便快速查阅。
 
 [![GitHub stars](https://img.shields.io/github/stars/Qliangw/notion_sync_data?style=plastic)](https://github.com/Qliangw/notion_sync_data/stargazers)
+[![GitHub](https://img.shields.io/github/license/Qliangw/notion_sync_data?style=plastic)](https://github.com/Qliangw/notion_sync_data/blob/main/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/Qliangw/notion_sync_data?style=plastic)](https://github.com/Qliangw/notion_sync_data/issues)
+[![GitHub pull-requests](https://img.shields.io/github/issues-pr/Qliangw/notion_sync_data?style=plastic)](https://github.com/Qliangw/notion_sync_data/pulls)
 [![GitHub all releases](https://img.shields.io/github/downloads/Qliangw/notion_sync_data/total?style=plastic)](https://github.com/Qliangw/notion_sync_data/releases)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=plastic)](https://github.com/Qliangw/notion_sync_data/pulls)
 
 ![Visitors](https://api.visitorbadge.io/api/combined?path=https%3A%2F%2Fgithub.com%2FQliangw%2Fnotion_sync_data&label=visitors&labelColor=%235d5d5d&countColor=%23d9e3f0&style=plastic)
 
@@ -49,6 +52,10 @@
 ## 其他
 
 **PR请申请合并至dev分支**
+
+## 交流群
+
+[![QQ](https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Feb1df73d-8c64-42b5-be66-93b9bad1892b%2FUntitled.png?id=62b6e654-dfc7-415f-ab86-c9510692518a&table=block&spaceId=f9577f4f-2b1b-4d1a-bc5f-8a0d880dece4&width=2000&userId=842edda1-c73b-4950-9465-b93ec8beba4c&cache=v2)](https://www.notion.so/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2Feb1df73d-8c64-42b5-be66-93b9bad1892b%2FUntitled.png?id=62b6e654-dfc7-415f-ab86-c9510692518a&table=block&spaceId=f9577f4f-2b1b-4d1a-bc5f-8a0d880dece4&width=2000&userId=842edda1-c73b-4950-9465-b93ec8beba4c&cache=v2)
 
 ## 鸣谢
 
