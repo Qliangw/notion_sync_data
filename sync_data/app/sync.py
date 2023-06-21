@@ -4,7 +4,6 @@
 # @Function:
 
 import random
-import os
 
 from sync_data.data.user_config import ConfigName, get_desensitization_of_user_info
 from sync_data.tool.douban import base
@@ -249,33 +248,33 @@ def start_sync(media_type, media_status):
     log_detail.info("【Config】读取用户配置的文件[config.yaml]")
 
     # 获取浏览器user-agent
-    user_agent = config_dict[ConfigName.USER_AGENT.value] or os.environ["USER_AGENT"]
-    user_cookie = config_dict[ConfigName.DOUBAN.value][ConfigName.USER_COOKIE.value] or os.environ["USER_COOKIE"]
+    user_agent = config_dict[ConfigName.USER_AGENT.value] or env.get("USER_AGENT")
+    user_cookie = config_dict[ConfigName.DOUBAN.value][ConfigName.USER_COOKIE.value]
     log_detail.info(f"【Config】- 取得浏览器 user-agent：{user_agent}")
 
     # 获取豆瓣信息
-    user_id = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_USER_ID.value] or os.environ["DOUBAN_USER_ID"]
+    user_id = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_USER_ID.value]
     # 用户id脱敏处理
     x_user_id = get_desensitization_of_user_info(user_id)
     log_detail.info(f"【Config】- 取得用户 id：{x_user_id}")
-    monitoring_day = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_DAY.value] or int(os.environ["DOUBAN_DAY"])
+    monitoring_day = config_dict[ConfigName.DOUBAN.value][ConfigName.DOUBAN_DAY.value]
     log_detail.info(f"【Config】- 取得监控日期：{monitoring_day}")
 
     # 获取notion数据库的信息
-    token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value] or os.environ["NOTION_TOKEN"]
+    token = config_dict[ConfigName.NOTION.value][ConfigName.NOTION_TOKEN.value]
     x_token = get_desensitization_of_user_info(token)
     log_detail.info(f"【Config】- 取得 notion 的 token：{x_token}")
 
     # auto_config = Config().get_config()
     database_id = ''
     if media_type == MediaType.BOOK.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_BOOK.value] or os.environ["NOTION_BOOKS_DB"]
+        database_id = config_dict['notion'][ConfigName.NOTION_BOOK.value]
     elif media_type == MediaType.MUSIC.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_MUSIC.value] or os.environ["NOTION_MUSIC_DB"]
+        database_id = config_dict['notion'][ConfigName.NOTION_MUSIC.value]
     elif media_type == MediaType.MOVIE.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_MOVIE.value] or os.environ["NOTION_MOVIE_DB"]
+        database_id = config_dict['notion'][ConfigName.NOTION_MOVIE.value]
     elif media_type == MediaType.GAME.value:
-        database_id = config_dict['notion'][ConfigName.NOTION_GAME.value] or os.environ["NOTION_GAME_DB"]
+        database_id = config_dict['notion'][ConfigName.NOTION_GAME.value]
     try:
         if database_id is None:
             log_detail.info(f"【Config】配置文件缺少重要参数")
