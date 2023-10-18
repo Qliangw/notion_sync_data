@@ -4,24 +4,25 @@
 # @Function: 主程序入口
 
 # IMPORT PACKAGES AND MODULES
-from gui.uis.windows.main_window.functions_main_window import *
 import sys
 import os
 
 # IMPORT QT CORE
+from sync_data.gui.core.functions import Functions
 from sync_data.gui.qt_core import *
 
 # IMPORT SETTINGS
-from gui.core.json_settings import Settings
+from sync_data.gui.core.json_settings import Settings
 
 # IMPORT PY ONE DARK WINDOWS
 # MAIN WINDOW
-from gui.uis.windows.main_window import *
+from sync_data.gui.uis.windows.main_window import *
 
 # IMPORT PY ONE DARK WIDGETS
-from gui.widgets import *
 
 # ADJUST QT FONT DPI FOR HIGHT SCALE AN 4K MONITOR
+from sync_data.gui.uis.windows.main_window.functions_main_window import MainFunctions
+
 os.environ["QT_FONT_DPI"] = "96"
 
 # IF IS 4K MONITOR ENABLE 'os.environ["QT_SCALE_FACTOR"] = "2"'
