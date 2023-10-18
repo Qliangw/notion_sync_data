@@ -9,7 +9,7 @@ import sys
 import os
 
 # IMPORT QT CORE
-from qt_core import *
+from sync_data.gui.qt_core import *
 
 # IMPORT SETTINGS
 from gui.core.json_settings import Settings
@@ -24,9 +24,7 @@ from gui.widgets import *
 # ADJUST QT FONT DPI FOR HIGHT SCALE AN 4K MONITOR
 os.environ["QT_FONT_DPI"] = "96"
 
-
 # IF IS 4K MONITOR ENABLE 'os.environ["QT_SCALE_FACTOR"] = "2"'
-
 # MAIN WINDOW
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -188,17 +186,13 @@ class MainWindow(QMainWindow):
         # SET DRAG POS WINDOW
         self.dragPos = event.globalPos()
 
-
 # SETTINGS WHEN TO START
 # Set the initial class and also additional parameters of the "QApplication" class
 if __name__ == "__main__":
     # APPLICATION
-
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
     window = MainWindow()
 
     # EXEC APP
-
-    sys.exit(app.exec_())
-
+    sys.exit(app.exec())
