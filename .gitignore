@@ -22,6 +22,8 @@ dist/
 /doc/config.yaml
 /doc/auto.yaml
 test.py
+test_ui.py
+
 setup.cfg
 Dockerfile
 
