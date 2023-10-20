@@ -1,23 +1,23 @@
-# -*- coding: utf-8 -*-
+# ///////////////////////////////////////////////////////////////
+#
+# BY: WANDERSON M.PIMENTA
+# PROJECT MADE WITH: Qt Designer and PySide6
+# V: 1.0.0
+#
+# This project can be used freely for all uses, as long as they maintain the
+# respective credits only in the Python scripts, any information in the visual
+# interface (GUI) can be modified without any implication.
+#
+# There are limitations on Qt licenses if you want to use your products
+# commercially, I recommend reading them on the official website:
+# https://doc.qt.io/qtforpython/licenses.html
+#
+# ///////////////////////////////////////////////////////////////
 
-################################################################################
-## Form generated from reading UI file 'ui_main_pages.ui'
-##
-## Created by: Qt User Interface Compiler version 6.6.0
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
+# IMPORT QT CORE
+# ///////////////////////////////////////////////////////////////
+from sync_data.gui.qt_core import *
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QPushButton, QScrollArea, QSizePolicy, QStackedWidget,
-    QTextBrowser, QVBoxLayout, QWidget)
 
 class Ui_MainPages(object):
     def setupUi(self, MainPages):
@@ -139,13 +139,6 @@ class Ui_MainPages(object):
         self.page_2_layout.addWidget(self.scroll_area)
 
         self.pages.addWidget(self.page_2)
-        self.page_4 = QWidget()
-        self.page_4.setObjectName(u"page_4")
-        self.page_4.setEnabled(True)
-        self.pushButton = QPushButton(self.page_4)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(120, 70, 75, 23))
-        self.pages.addWidget(self.page_4)
         self.page_3 = QWidget()
         self.page_3.setObjectName(u"page_3")
         self.page_3.setStyleSheet(u"QFrame {\n"
@@ -160,11 +153,6 @@ class Ui_MainPages(object):
 
         self.page_3_layout.addWidget(self.empty_page_label)
 
-        self.textBrowser = QTextBrowser(self.page_3)
-        self.textBrowser.setObjectName(u"textBrowser")
-
-        self.page_3_layout.addWidget(self.textBrowser)
-
         self.pages.addWidget(self.page_3)
 
         self.main_pages_layout.addWidget(self.pages)
@@ -172,7 +160,7 @@ class Ui_MainPages(object):
 
         self.retranslateUi(MainPages)
 
-        self.pages.setCurrentIndex(3)
+        self.pages.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainPages)
@@ -180,16 +168,10 @@ class Ui_MainPages(object):
 
     def retranslateUi(self, MainPages):
         MainPages.setWindowTitle(QCoreApplication.translate("MainPages", u"Form", None))
-        self.label.setText(QCoreApplication.translate("MainPages", u"Welcome To PyOneDark GUI", None))
+        self.label.setText(QCoreApplication.translate("MainPages", u"Welcome To NotionSyncData", None))
         self.title_label.setText(QCoreApplication.translate("MainPages", u"Custom Widgets Page", None))
         self.description_label.setText(QCoreApplication.translate("MainPages", u"Here will be all the custom widgets, they will be added over time on this page.\n"
 "I will try to always record a new tutorial when adding a new Widget and updating the project on Patreon before launching on GitHub and GitHub after the public release.", None))
-        self.pushButton.setText(QCoreApplication.translate("MainPages", u"PushButton", None))
         self.empty_page_label.setText(QCoreApplication.translate("MainPages", u"Empty Page", None))
-        self.textBrowser.setHtml(QCoreApplication.translate("MainPages", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'SimSun'; font-size:16pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">TEST</p></body></html>", None))
     # retranslateUi
 

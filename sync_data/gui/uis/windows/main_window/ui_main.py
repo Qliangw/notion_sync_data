@@ -31,6 +31,7 @@ from sync_data.gui.widgets import *
 # IMPORT SETUP MAIN WINDOW
 
 # IMPORT MAIN WINDOW PAGES / AND SIDE BOXES FOR APP
+#from sync_data.gui.uis.pages.ui_main_pages import Ui_MainPages
 from sync_data.gui.uis.pages.ui_main_pages import Ui_MainPages
 
 # RIGHT COLUMN
