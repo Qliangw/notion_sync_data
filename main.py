@@ -77,6 +77,14 @@ class MainWindow(QMainWindow):
             # Load Page 1
             MainFunctions.set_page(self, self.ui.load_pages.page_1)
 
+        # notion BTN
+        if btn.objectName() == "btn_notion":
+                # Select Menu
+                self.ui.left_menu.select_only_one(btn.objectName())
+
+                # Load Page 1
+                MainFunctions.set_page(self, self.ui.load_pages.page_2)
+
         # WIDGETS BTN
         if btn.objectName() == "btn_widgets":
             # Select Menu

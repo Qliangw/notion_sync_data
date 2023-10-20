@@ -60,6 +60,14 @@ class SetupMainWindow:
             "is_active" : True
         },
         {
+            "btn_icon": "icon_settings.svg",
+            "btn_id": "btn_notion",
+            "btn_text": "Notion",
+            "btn_tooltip": "Home page",
+            "show_top": True,
+            "is_active": True
+        },
+        {
             "btn_icon" : "icon_widgets.svg",
             "btn_id" : "btn_widgets",
             "btn_text" : "Show Custom Widgets",
