@@ -29,6 +29,7 @@ Dockerfile
 
 # 临时文件
 tmp/
+test/
 
 # 日志文件
 logs
