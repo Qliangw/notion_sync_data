@@ -1,7 +1,5 @@
 {
     "app_name": "NotionSyncDat GUI",
-    "version" : "0.2.0-release",
-    "copyright" : "By: Qliangw",
     "year" : 2023,
     "theme_name" : "default",
     "custom_title_bar": true,

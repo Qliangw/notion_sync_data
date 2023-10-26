@@ -266,8 +266,6 @@ class UI_MainWindow(object):
         # ADD CUSTOM WIDGET CREDITS
         self.credits = PyCredits(
             bg_two = self.themes["app_color"]["bg_two"],
-            copyright = self.settings["copyright"],
-            version = self.settings["version"],
             font_family = self.settings["font"]["family"],
             text_size = self.settings["font"]["text_size"],
             text_description_color = self.themes["app_color"]["text_description"]

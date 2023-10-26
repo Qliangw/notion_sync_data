@@ -18,13 +18,17 @@
 # ///////////////////////////////////////////////////////////////
 from sync_data.gui.qt_core import *
 
+from sync_data.version import version as ver
+
+
+def get_version():
+    return ver
+
 # PY CREDITS BAR AND VERSION
 # ///////////////////////////////////////////////////////////////
 class PyCredits(QWidget):
     def __init__(
         self,
-        copyright,
-        version,
         bg_two,
         font_family,
         text_size,
@@ -35,8 +39,8 @@ class PyCredits(QWidget):
         super().__init__()
 
         # PROPERTIES
-        self._copyright = copyright
-        self._version = version
+        # self._copyright = copyright
+        self._version = get_version()
         self._bg_two = bg_two
         self._font_family = font_family
         self._text_size = text_size
@@ -79,7 +83,8 @@ class PyCredits(QWidget):
         self.bg_layout.setContentsMargins(0,0,0,0)
 
         # ADD COPYRIGHT TEXT
-        self.copyright_label = QLabel(self._copyright)
+        #self.copyright_label = QLabel("self._copyright")
+        self.copyright_label = QLabel('By: Qliangw')
         self.copyright_label.setAlignment(Qt.AlignVCenter)
 
         # ADD VERSION TEXT
