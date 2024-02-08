@@ -21,10 +21,10 @@ user_agent : ''
 # 豆瓣参数
 douban:
   # 【必填】
-  user_id: ''
+  user_id: 'snowsuns'
 
   # 【必填】 1. 填写为0时，监控所有的  | 2. 填写非零的正整数，则监控x天内的。比如填写30，则监控一个月内的；365，则监控一年内的。
-  day:
+  day: 0
 
   # 【可选】从浏览器中获取
   # 填写后可解决某些导入失败的问题，但有被豆瓣封号的风险，请知悉
@@ -34,10 +34,10 @@ douban:
 notion:
   # 打开notion -> setting & Members -> integrations -> 最后一行【Develop your own integrations】
   # 或者复制此链接 https://www.notion.so/my-integrations 在浏览器打开
-  token: ''
+  token: 'secret_JsMlR8MC4BwCHSN3Z19iIH4ZPeFEdC18zVxlaVseMOa'
 
   # 在浏览器打开你要导入的notion页面，复制后面的一串数字
-  page_id: ''
+  page_id: '2-3a803117b78c49a1b4c62c365fa50c8b'
 
   # 以下为自动配置，请勿改动
   book_database_id: ''
